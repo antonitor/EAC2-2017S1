@@ -20,6 +20,7 @@ public class NetworkUtils {
 
     public static InputStream getResponseFromHttpUrl(URL url) throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        Log.d(LOG_TAG, "HTTPURLCONNECTION");
         try {
             return urlConnection.getInputStream();
         } catch (IOException ioe) {

@@ -4,7 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
@@ -30,7 +30,7 @@ import cat.xtec.ioc.eac2_2017s1.utils.NetworkUtils;
 import cat.xtec.ioc.eac2_2017s1.utils.NoticiesListAdapter;
 import cat.xtec.ioc.eac2_2017s1.utils.MarcaXmlParser.Noticia;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<ArrayList<Noticia>>{
+public class MainActivity extends AppCompatActivity implements LoaderCallbacks<ArrayList<Noticia>>{
 
     private NoticiesListAdapter mAdapter;
     private SQLiteDatabase mBD;
@@ -55,9 +55,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         //fillWithFakeData();
 
-        getSupportLoaderManager().initLoader(NOTICIES_LOADER_ID, null, this);
+        LoaderCallbacks<ArrayList<Noticia>> callback = MainActivity.this;
+        getSupportLoaderManager().initLoader(NOTICIES_LOADER_ID, null, callback);
 
-        fillRecyclerFromSQLite(getNoticies());
+
 
     }
 
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     private Cursor getNoticies() {
+        Log.d(LOG_TAG, "Recollint noticies de la BD");
         return mBD.query(
                 Noticies.NOM_TAULA,
                 null,
@@ -117,21 +119,26 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public Loader<ArrayList<Noticia>> onCreateLoader(int id, Bundle args) {
         return new AsyncTaskLoader<ArrayList<Noticia>>(this) {
+
+            @Override
+            protected void onStartLoading() {
+                forceLoad();
+            }
+
             @Override
             public ArrayList<Noticia> loadInBackground() {
                 URL url = NetworkUtils.buildURl(NetworkUtils.sUrl);
+                Log.d(LOG_TAG, NetworkUtils.sUrl);
                 InputStream in;
-                ArrayList<Noticia> llistaNoticies;
                 try {
                     in = NetworkUtils.getResponseFromHttpUrl(url);
-
                 } catch (IOException ioe){
                     Log.d(LOG_TAG, "Error al realitzar la connexió.");
                     in = null;
                 }
 
                 try {
-                    return llistaNoticies = (ArrayList<Noticia>) new MarcaXmlParser().analitza(in);
+                    return (ArrayList<Noticia>) new MarcaXmlParser().analitza(in);
                 } catch (XmlPullParserException e) {
                     e.printStackTrace();
                     Log.d(LOG_TAG, "Error de contingut XML.");
@@ -147,17 +154,23 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<ArrayList<Noticia>> loader, ArrayList<Noticia> data) {
-        for (Noticia noticia : data) {
-            ContentValues cv = new ContentValues();
-            cv.put(Noticies.TITOL, noticia.titol);
-            cv.put(Noticies.AUTOR, noticia.autor);
-            cv.put(Noticies.DESCRIPCIO, noticia.descripcio);
-            cv.put(Noticies.DATA_PUBLICACIO, noticia.data);
-            cv.put(Noticies.CATEGORIA, noticia.categoria);
-            cv.put(Noticies.ENLLAC, noticia.enllac);
-            cv.put(Noticies.THUMBNAIL, "");
-            mBD.insert(Noticies.NOM_TAULA,null,cv);
+        if (data != null) {
+            Log.d(LOG_TAG, "Array empty: " + data.isEmpty());
+            for (Noticia noticia : data) {
+                Log.d(LOG_TAG, noticia.toString() + " " + noticia.autor);
+                ContentValues cv = new ContentValues();
+                cv.put(Noticies.TITOL, noticia.titol);
+                cv.put(Noticies.AUTOR, noticia.autor);
+                cv.put(Noticies.DESCRIPCIO, noticia.descripcio);
+                cv.put(Noticies.DATA_PUBLICACIO, noticia.data);
+                cv.put(Noticies.CATEGORIA, noticia.categoria);
+                cv.put(Noticies.ENLLAC, noticia.enllac);
+                cv.put(Noticies.THUMBNAIL, "");
+                mBD.insert(Noticies.NOM_TAULA, null, cv);
+            }
+
         }
+        fillRecyclerFromSQLite(getNoticies());
     }
 
     @Override
