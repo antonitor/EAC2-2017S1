@@ -4,6 +4,9 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,11 +30,12 @@ import cat.xtec.ioc.eac2_2017s1.utils.NetworkUtils;
 import cat.xtec.ioc.eac2_2017s1.utils.NoticiesListAdapter;
 import cat.xtec.ioc.eac2_2017s1.utils.MarcaXmlParser.Noticia;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<ArrayList<Noticia>>{
 
     private NoticiesListAdapter mAdapter;
     private SQLiteDatabase mBD;
     private RecyclerView noticiesRecyclerView;
+    private static final int NOTICIES_LOADER_ID = 0;
     public final static String LOG_TAG = "TESTING -------->>>>>  ";
 
     @Override
@@ -51,49 +55,10 @@ public class MainActivity extends AppCompatActivity {
 
         //fillWithFakeData();
 
-        descarregaDadesXarxa();
+        getSupportLoaderManager().initLoader(NOTICIES_LOADER_ID, null, this);
 
         fillRecyclerFromSQLite(getNoticies());
 
-    }
-
-    private void descarregaDadesXarxa(){
-        URL url = NetworkUtils.buildURl(NetworkUtils.sUrl);
-        InputStream in;
-        ArrayList<Noticia> llistaNoticies;
-        try {
-            in = NetworkUtils.getResponseFromHttpUrl(url);
-
-        } catch (IOException ioe){
-            Log.d(LOG_TAG, "Error al realitzar la connexió.");
-            in = null;
-        }
-
-        if (in != null) {
-            try {
-                llistaNoticies = (ArrayList<Noticia>) new MarcaXmlParser().analitza(in);
-                guardaNoticesBD(llistaNoticies);
-            } catch (XmlPullParserException e) {
-                e.printStackTrace();
-                Log.d(LOG_TAG, "Error de contingut XML.");
-            } catch (IOException e) {
-                Log.d(LOG_TAG, "Error d'inputStream al XMLParser.");
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void guardaNoticesBD(ArrayList<Noticia> llistaNoticies ) {
-        for (Noticia noticia : llistaNoticies) {
-            ContentValues cv = new ContentValues();
-            cv.put(Noticies.TITOL, noticia.titol);
-            cv.put(Noticies.AUTOR, noticia.autor);
-            cv.put(Noticies.DESCRIPCIO, noticia.descripcio);
-            cv.put(Noticies.DATA_PUBLICACIO, noticia.data);
-            cv.put(Noticies.CATEGORIA, noticia.categoria);
-            cv.put(Noticies.ENLLAC, noticia.enllac);
-            cv.put(Noticies.THUMBNAIL, "");
-        }
     }
 
 
@@ -149,4 +114,54 @@ public class MainActivity extends AppCompatActivity {
         return mBD.insert(Noticies.NOM_TAULA,null,cv);
     }
 
+    @Override
+    public Loader<ArrayList<Noticia>> onCreateLoader(int id, Bundle args) {
+        return new AsyncTaskLoader<ArrayList<Noticia>>(this) {
+            @Override
+            public ArrayList<Noticia> loadInBackground() {
+                URL url = NetworkUtils.buildURl(NetworkUtils.sUrl);
+                InputStream in;
+                ArrayList<Noticia> llistaNoticies;
+                try {
+                    in = NetworkUtils.getResponseFromHttpUrl(url);
+
+                } catch (IOException ioe){
+                    Log.d(LOG_TAG, "Error al realitzar la connexió.");
+                    in = null;
+                }
+
+                try {
+                    return llistaNoticies = (ArrayList<Noticia>) new MarcaXmlParser().analitza(in);
+                } catch (XmlPullParserException e) {
+                    e.printStackTrace();
+                    Log.d(LOG_TAG, "Error de contingut XML.");
+                    return null;
+                } catch (IOException e) {
+                    Log.d(LOG_TAG, "Error d'inputStream al XMLParser.");
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<ArrayList<Noticia>> loader, ArrayList<Noticia> data) {
+        for (Noticia noticia : data) {
+            ContentValues cv = new ContentValues();
+            cv.put(Noticies.TITOL, noticia.titol);
+            cv.put(Noticies.AUTOR, noticia.autor);
+            cv.put(Noticies.DESCRIPCIO, noticia.descripcio);
+            cv.put(Noticies.DATA_PUBLICACIO, noticia.data);
+            cv.put(Noticies.CATEGORIA, noticia.categoria);
+            cv.put(Noticies.ENLLAC, noticia.enllac);
+            cv.put(Noticies.THUMBNAIL, "");
+            mBD.insert(Noticies.NOM_TAULA,null,cv);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<ArrayList<Noticia>> loader) {
+
+    }
 }
