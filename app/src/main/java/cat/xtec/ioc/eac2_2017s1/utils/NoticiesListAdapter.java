@@ -43,7 +43,12 @@ public class NoticiesListAdapter extends RecyclerView.Adapter<NoticiesListAdapte
         String titol = mCursor.getString(mCursor.getColumnIndex(Noticies.TITOL));
         long id = mCursor.getLong(mCursor.getColumnIndex(Noticies._ID));
 
-        holder.thumbnailImageView.setImageURI(Uri.parse(thumnail));
+        if (thumnail.length()>0) {
+            holder.thumbnailImageView.setImageURI(Uri.parse(thumnail));
+        } else {
+            holder.thumbnailImageView.setImageResource(R.drawable.nofound);
+        }
+
         holder.titolNoticiaTextView.setText(titol);
         holder.itemView.setTag(id);
 

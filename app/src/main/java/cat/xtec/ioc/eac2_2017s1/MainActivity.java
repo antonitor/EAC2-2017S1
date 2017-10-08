@@ -1,23 +1,67 @@
 package cat.xtec.ioc.eac2_2017s1;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import cat.xtec.ioc.eac2_2017s1.data.AjudaBD;
+import cat.xtec.ioc.eac2_2017s1.data.Contracte.Noticies;
+import cat.xtec.ioc.eac2_2017s1.utils.NoticiesListAdapter;
+
 public class MainActivity extends AppCompatActivity {
+
+    private NoticiesListAdapter mAdapter;
+    private SQLiteDatabase mBD;
+    private RecyclerView noticiesRecyclerView;
+    private final static String LOG_TAG = "TESTING -------->>>>>  ";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        noticiesRecyclerView = (RecyclerView) findViewById(R.id.noticies_recycler_view);
+        noticiesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+
+        AjudaBD ajudaBD = new AjudaBD(this);
+        mBD = ajudaBD.getReadableDatabase();
+
+        fillWithFakeData();
+
+        fillRecyclerFromSQLite(getNoticies());
+
+    }
+
+    public void fillRecyclerFromSQLite (Cursor cursor) {
+        mAdapter = new NoticiesListAdapter(this, cursor);
+        noticiesRecyclerView.setAdapter(mAdapter);
+    }
+
+    public Cursor getNoticies() {
+        return mBD.query(
+                Noticies.NOM_TAULA,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
     }
 
     @Override
@@ -40,4 +84,19 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private long fillWithFakeData() {
+        ContentValues cv = new ContentValues();
+        cv.put(Noticies.TITOL, "Noticia Falsa per omplir el recycler");
+        cv.put(Noticies.AUTOR, "Pep");
+        cv.put(Noticies.DESCRIPCIO, "Tan sols és una noticia falsa");
+        cv.put(Noticies.DATA_PUBLICACIO, "08-10-2017");
+        cv.put(Noticies.CATEGORIA, "Noticies Falses");
+        cv.put(Noticies.ENLLAC, "www.noticia-falsa.fal");
+        cv.put(Noticies.THUMBNAIL, "");
+        mBD.insert(Noticies.NOM_TAULA,null,cv);
+        mBD.insert(Noticies.NOM_TAULA,null,cv);
+        return mBD.insert(Noticies.NOM_TAULA,null,cv);
+    }
+
 }

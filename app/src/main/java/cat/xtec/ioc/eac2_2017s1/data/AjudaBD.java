@@ -20,14 +20,14 @@ public class AjudaBD extends SQLiteOpenHelper{
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         final String SQL_CREAR_TAULA_NOTICIES = "CREATE TABLE " + Noticies.NOM_TAULA + " (" +
-                Noticies._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                Noticies._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 Noticies.TITOL + " TEXT NOT NULL, " +
                 Noticies.AUTOR + " TEXT NOT NULL, " +
                 Noticies.DESCRIPCIO + " TEXT NOT NULL, " +
                 Noticies.DATA_PUBLICACIO + " TEXT NOT NULL, " +
                 Noticies.CATEGORIA + " TEXT NOT NULL, " +
                 Noticies.ENLLAC + " TEXT NOT NULL, " +
-                Noticies.THUMBNAIL + " TEXT NOT NULL, " +
+                Noticies.THUMBNAIL + " TEXT NOT NULL " +
                 "); ";
 
         sqLiteDatabase.execSQL(SQL_CREAR_TAULA_NOTICIES);
