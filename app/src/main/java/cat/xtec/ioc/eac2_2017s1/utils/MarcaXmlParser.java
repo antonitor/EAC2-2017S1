@@ -103,8 +103,8 @@ public class MarcaXmlParser {
         String categoria = null;
         String thumbnail = null;
 
-        //L'etiqueta actual ha de ser "entry"
-        parser.require(XmlPullParser.START_TAG, ns, "entry");
+        //L'etiqueta actual ha de ser "item"
+        parser.require(XmlPullParser.START_TAG, ns, "item");
 
         //Mentre que no acabe l'etiqueta de "entry"
         while (parser.next() != XmlPullParser.END_TAG) {
@@ -120,10 +120,10 @@ public class MarcaXmlParser {
                 case "title":
                     titol = llegirTitol(parser);
                     break;
-                case "enllac":
+                case "link":
                     enllac = llegirEnllac(parser);
                     break;
-                case "creator":
+                case "dc:creator":
                     autor = llegirAutor(parser);
                     break;
                 case "description":
@@ -191,21 +191,8 @@ public class MarcaXmlParser {
         //L'etiqueta actual ha de ser "link"
         parser.require(XmlPullParser.START_TAG, ns, "link");
 
-        //Obtenim l'etiqueta
-        String tag = parser.getName();
-
-        //Obtenim l'atribut rel (mirar l'XML d'Stackoverflow)
-        String relType = parser.getAttributeValue(null, "rel");
-
-        //Si l'enllaç és link
-
-        if (tag.equals("link")) {
-            //Obtenim l'enlla del valor de l'atribut "href". Revisar format XML stackoverflow
-            if (relType.equals("alternate")) {
-                enllac = parser.getAttributeValue(null, "href");
-                parser.nextTag();
-            }
-        }
+        //Llegeix
+        enllac = llegeixText(parser);
 
         //Fi d'etiqueta
         parser.require(XmlPullParser.END_TAG, ns, "link");
@@ -216,11 +203,11 @@ public class MarcaXmlParser {
     //Llegeix l'autor de una notícia del feed i el retorna com String
     private String llegirAutor(XmlPullParser parser) throws IOException, XmlPullParserException {
         //L'etiqueta actual ha de ser "summary"
-        parser.require(XmlPullParser.START_TAG, ns, "creator");
+        parser.require(XmlPullParser.START_TAG, ns, "dc:creator");
 
         String resum = llegeixText(parser);
 
-        parser.require(XmlPullParser.END_TAG, ns, "creator");
+        parser.require(XmlPullParser.END_TAG, ns, "dc:creator");
         return resum;
     }
 
@@ -263,22 +250,12 @@ public class MarcaXmlParser {
         String thumbnail = "";
 
         //L'etiqueta actual ha de ser "thumbnail"
-        parser.require(XmlPullParser.START_TAG, ns, "thumbnail ");
+        parser.require(XmlPullParser.START_TAG, ns, "media:thumbnail ");
 
-        //Obtenim l'etiqueta
-        String tag = parser.getName();
+        thumbnail = parser.getAttributeValue(null, "url");
 
-        //Obtenim l'atribut url
-        String relType = parser.getAttributeValue(null, "url");
+        parser.require(XmlPullParser.END_TAG, ns, "category");
 
-        //Si l'enllaç és link
-        if (tag.equals("link")) {
-            //Obtenim l'enllaç del valor de l'atribut "url".
-            if (relType.equals("alternate")) {
-                thumbnail = parser.getAttributeValue(null, "url");
-                parser.nextTag();
-            }
-        }
         return thumbnail;
     }
 
