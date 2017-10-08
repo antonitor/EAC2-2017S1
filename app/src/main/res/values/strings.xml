@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">EAC2-2017S1</string>
     <string name="action_search">Buscar</string>
+    <string name="action_refresh">Actualitzar</string>
 </resources>

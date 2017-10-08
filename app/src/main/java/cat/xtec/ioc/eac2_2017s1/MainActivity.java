@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,11 +30,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
-        if (id == R.id.action_search) {
-            return true;
+        switch (id) {
+            case R.id.action_search:
+                Toast.makeText(this,"SEARCH!",Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.action_refresh:
+                Toast.makeText(this,"REFRESH!",Toast.LENGTH_SHORT).show();
+                return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 }
