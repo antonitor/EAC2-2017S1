@@ -4,27 +4,35 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
+
 import cat.xtec.ioc.eac2_2017s1.data.AjudaBD;
 import cat.xtec.ioc.eac2_2017s1.data.Contracte.Noticies;
+import cat.xtec.ioc.eac2_2017s1.utils.MarcaXmlParser;
+import cat.xtec.ioc.eac2_2017s1.utils.NetworkUtils;
 import cat.xtec.ioc.eac2_2017s1.utils.NoticiesListAdapter;
+import cat.xtec.ioc.eac2_2017s1.utils.MarcaXmlParser.Noticia;
 
 public class MainActivity extends AppCompatActivity {
 
     private NoticiesListAdapter mAdapter;
     private SQLiteDatabase mBD;
     private RecyclerView noticiesRecyclerView;
-    private final static String LOG_TAG = "TESTING -------->>>>>  ";
+    public final static String LOG_TAG = "TESTING -------->>>>>  ";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,18 +49,60 @@ public class MainActivity extends AppCompatActivity {
         AjudaBD ajudaBD = new AjudaBD(this);
         mBD = ajudaBD.getReadableDatabase();
 
-        fillWithFakeData();
+        //fillWithFakeData();
+
+        descarregaDadesXarxa();
 
         fillRecyclerFromSQLite(getNoticies());
 
     }
 
-    public void fillRecyclerFromSQLite (Cursor cursor) {
+    private void descarregaDadesXarxa(){
+        URL url = NetworkUtils.buildURl(NetworkUtils.sUrl);
+        InputStream in;
+        ArrayList<Noticia> llistaNoticies;
+        try {
+            in = NetworkUtils.getResponseFromHttpUrl(url);
+
+        } catch (IOException ioe){
+            Log.d(LOG_TAG, "Error al realitzar la connexió.");
+            in = null;
+        }
+
+        if (in != null) {
+            try {
+                llistaNoticies = (ArrayList<Noticia>) new MarcaXmlParser().analitza(in);
+                guardaNoticesBD(llistaNoticies);
+            } catch (XmlPullParserException e) {
+                e.printStackTrace();
+                Log.d(LOG_TAG, "Error de contingut XML.");
+            } catch (IOException e) {
+                Log.d(LOG_TAG, "Error d'inputStream al XMLParser.");
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void guardaNoticesBD(ArrayList<Noticia> llistaNoticies ) {
+        for (Noticia noticia : llistaNoticies) {
+            ContentValues cv = new ContentValues();
+            cv.put(Noticies.TITOL, noticia.titol);
+            cv.put(Noticies.AUTOR, noticia.autor);
+            cv.put(Noticies.DESCRIPCIO, noticia.descripcio);
+            cv.put(Noticies.DATA_PUBLICACIO, noticia.data);
+            cv.put(Noticies.CATEGORIA, noticia.categoria);
+            cv.put(Noticies.ENLLAC, noticia.enllac);
+            cv.put(Noticies.THUMBNAIL, "");
+        }
+    }
+
+
+    private void fillRecyclerFromSQLite (Cursor cursor) {
         mAdapter = new NoticiesListAdapter(this, cursor);
         noticiesRecyclerView.setAdapter(mAdapter);
     }
 
-    public Cursor getNoticies() {
+    private Cursor getNoticies() {
         return mBD.query(
                 Noticies.NOM_TAULA,
                 null,

@@ -20,7 +20,7 @@ public class MarcaXmlParser {
     private static final String ns = null;
 
     //Aquesta classe representa una entrada de noticia del RSS Feed
-    public static class Entrada {
+    public static class Noticia {
         public final String titol;          //Títol de la noticia
         public final String enllac;         //Enllaç a la noticia completa
         public final String autor;          //Autor de la notícia
@@ -30,7 +30,7 @@ public class MarcaXmlParser {
         public final String thumbnail;      //Enllaç al thumbnail de la imatge
 
 
-        private Entrada(String title, String author, String link, String desc, String date, String cat, String thumb) {
+        private Noticia(String title, String author, String link, String desc, String date, String cat, String thumb) {
             this.titol = title;
             this.autor = author;
             this.enllac = link;
@@ -41,7 +41,7 @@ public class MarcaXmlParser {
         }
     }
 
-    public List<Entrada> analitza(InputStream in) throws XmlPullParserException, IOException {
+    public List<Noticia> analitza(InputStream in) throws XmlPullParserException, IOException {
         try {
             //Obtenim analitzador
             XmlPullParser parser = Xml.newPullParser();
@@ -63,8 +63,8 @@ public class MarcaXmlParser {
     }
 
     //Llegeix una llista de noticies de Marca a partir del parser i retorna una llista d'Entrades
-    private List<Entrada> llegirNoticies(XmlPullParser parser) throws XmlPullParserException, IOException {
-        List<Entrada> llistaEntrades = new ArrayList<Entrada>();
+    private List<Noticia> llegirNoticies(XmlPullParser parser) throws XmlPullParserException, IOException {
+        List<Noticia> llistaEntrades = new ArrayList<Noticia>();
 
         //Comprova si l'event actual és del tipus esperat (START_TAG) i del nom "feed"
         parser.require(XmlPullParser.START_TAG, ns, "feed");
@@ -94,7 +94,7 @@ public class MarcaXmlParser {
 
     //Analitza el contingut d'una entrada. Si troba un ttol, resum o enllaç, crida els mètodes de lectura
     //propis per processar-los. Si no, ignora l'etiqueta.
-    private Entrada llegirEntrada(XmlPullParser parser) throws XmlPullParserException, IOException {
+    private Noticia llegirEntrada(XmlPullParser parser) throws XmlPullParserException, IOException {
         String titol = null;
         String enllac = null;
         String autor = null;
@@ -144,7 +144,7 @@ public class MarcaXmlParser {
         }
 
         //Creem una nova entrada amb aquestes dades i la retornem
-        return new Entrada(titol, enllac, autor, descripcio, data, categoria, thumbnail);
+        return new Noticia(titol, enllac, autor, descripcio, data, categoria, thumbnail);
     }
 
     //Aquesta funció serveix per saltar-se una etiqueta i les seves subetiquetes aniuades.
