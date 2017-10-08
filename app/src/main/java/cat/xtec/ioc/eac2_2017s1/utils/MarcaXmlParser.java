@@ -1,4 +1,4 @@
-package cat.xtec.ioc.eac2_2017s1;
+package cat.xtec.ioc.eac2_2017s1.utils;
 
 import android.util.Xml;
 

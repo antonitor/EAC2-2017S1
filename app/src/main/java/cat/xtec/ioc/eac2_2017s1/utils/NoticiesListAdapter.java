@@ -1,6 +1,5 @@
-package cat.xtec.ioc.eac2_2017s1;
+package cat.xtec.ioc.eac2_2017s1.utils;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
@@ -10,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import cat.xtec.ioc.eac2_2017s1.R;
 import cat.xtec.ioc.eac2_2017s1.data.Contracte.Noticies;
 /**
  * Created by Toni on 08/10/2017.
