@@ -30,6 +30,8 @@ import cat.xtec.ioc.eac2_2017s1.utils.NetworkUtils;
 import cat.xtec.ioc.eac2_2017s1.utils.NoticiesListAdapter;
 import cat.xtec.ioc.eac2_2017s1.utils.MarcaXmlParser.Noticia;
 
+import static cat.xtec.ioc.eac2_2017s1.utils.NetworkUtils.comprovaXarxa;
+
 public class MainActivity extends AppCompatActivity implements LoaderCallbacks<ArrayList<Noticia>>{
 
     private NoticiesListAdapter mAdapter;
@@ -54,11 +56,12 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<A
         mBD = ajudaBD.getReadableDatabase();
 
         //fillWithFakeData();
-
-        LoaderCallbacks<ArrayList<Noticia>> callback = MainActivity.this;
-        getSupportLoaderManager().initLoader(NOTICIES_LOADER_ID, null, callback);
-
-
+        if (comprovaXarxa(this)) {
+            LoaderCallbacks<ArrayList<Noticia>> callback = MainActivity.this;
+            getSupportLoaderManager().initLoader(NOTICIES_LOADER_ID, null, callback);
+        } else {
+            fillRecyclerFromSQLite(getNoticies());
+        }
 
     }
 
@@ -147,6 +150,12 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<A
                     Log.d(LOG_TAG, "Error d'inputStream al XMLParser.");
                     e.printStackTrace();
                     return null;
+                } finally {
+                    try {
+                        in.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         };
