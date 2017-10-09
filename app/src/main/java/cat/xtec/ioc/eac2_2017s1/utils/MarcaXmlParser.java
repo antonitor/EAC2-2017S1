@@ -1,5 +1,6 @@
 package cat.xtec.ioc.eac2_2017s1.utils;
 
+import android.util.Log;
 import android.util.Xml;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -9,6 +10,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import static cat.xtec.ioc.eac2_2017s1.MainActivity.LOG_TAG;
 
 /**
  * Created by Admin on 05/10/2017.
@@ -66,8 +69,12 @@ public class MarcaXmlParser {
     private List<Noticia> llegirNoticies(XmlPullParser parser) throws XmlPullParserException, IOException {
         List<Noticia> llistaEntrades = new ArrayList<Noticia>();
 
-        //Comprova si l'event actual és del tipus esperat (START_TAG) i del nom "feed"
-        parser.require(XmlPullParser.START_TAG, ns, "feed");
+        //Comprova si l'event actual és del tipus esperat (START_TAG) i del nom "rss"
+        parser.require(XmlPullParser.START_TAG, ns, "rss");
+        Log.d(LOG_TAG, "RSS TAG");
+        parser.nextTag();
+        parser.require(XmlPullParser.START_TAG, ns, "channel");
+        Log.d(LOG_TAG, "channel TAG");
 
         //Mentre que no arribem al final d'etiqueta
         while (parser.next() != XmlPullParser.END_TAG) {
@@ -76,12 +83,12 @@ public class MarcaXmlParser {
                 //Saltem al seguent event
                 continue;
             }
-
             //Obtenim el nom de l'etiqueta
             String name = parser.getName();
-
+            Log.d(LOG_TAG, "LLEGIT " + name +" TAG");
             // Si aquesta etiqueta és una entrada de noticia
-            if (name.equals("entry")) {
+            if (name.equals("item")) {
+                Log.d(LOG_TAG, "ITEM TAG");
                 //Afegim l'entrada a la llista
                 llistaEntrades.add(llegirEntrada(parser));
             } else {
@@ -123,7 +130,7 @@ public class MarcaXmlParser {
                 case "link":
                     enllac = llegirEnllac(parser);
                     break;
-                case "dc:creator":
+                case "creator":
                     autor = llegirAutor(parser);
                     break;
                 case "description":
@@ -203,20 +210,21 @@ public class MarcaXmlParser {
     //Llegeix l'autor de una notícia del feed i el retorna com String
     private String llegirAutor(XmlPullParser parser) throws IOException, XmlPullParserException {
         //L'etiqueta actual ha de ser "summary"
-        parser.require(XmlPullParser.START_TAG, ns, "dc:creator");
+        parser.require(XmlPullParser.START_TAG, ns, "creator");
 
-        String resum = llegeixText(parser);
+        String autor = llegeixText(parser);
 
-        parser.require(XmlPullParser.END_TAG, ns, "dc:creator");
-        return resum;
+        parser.require(XmlPullParser.END_TAG, ns, "creator");
+        return autor;
     }
 
     //Llegeix la descripció de una notícia del feed i el retorna com String
     private String llegirDescripcio(XmlPullParser parser) throws IOException, XmlPullParserException {
         //L'etiqueta actual ha de ser "summary"
+        String resum = "";
         parser.require(XmlPullParser.START_TAG, ns, "description");
 
-        String resum = llegeixText(parser);
+        resum = llegeixText(parser);
 
         parser.require(XmlPullParser.END_TAG, ns, "description");
         return resum;
@@ -250,11 +258,11 @@ public class MarcaXmlParser {
         String thumbnail = "";
 
         //L'etiqueta actual ha de ser "thumbnail"
-        parser.require(XmlPullParser.START_TAG, ns, "media:thumbnail ");
+        parser.require(XmlPullParser.START_TAG, ns, "thumbnail");
 
         thumbnail = parser.getAttributeValue(null, "url");
 
-        parser.require(XmlPullParser.END_TAG, ns, "category");
+        parser.require(XmlPullParser.END_TAG, ns, "thumbnail");
 
         return thumbnail;
     }

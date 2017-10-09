@@ -166,14 +166,14 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<A
         if (data != null) {
             Log.d(LOG_TAG, "Array empty: " + data.isEmpty());
             for (Noticia noticia : data) {
-                Log.d(LOG_TAG, noticia.toString() + " " + noticia.autor);
+                Log.d(LOG_TAG, noticia.titol);
                 ContentValues cv = new ContentValues();
                 cv.put(Noticies.TITOL, noticia.titol);
                 cv.put(Noticies.AUTOR, noticia.autor);
                 cv.put(Noticies.DESCRIPCIO, noticia.descripcio);
                 cv.put(Noticies.DATA_PUBLICACIO, noticia.data);
-                cv.put(Noticies.CATEGORIA, noticia.categoria);
-                cv.put(Noticies.ENLLAC, noticia.enllac);
+                cv.put(Noticies.CATEGORIA, "");
+                cv.put(Noticies.ENLLAC, "");
                 cv.put(Noticies.THUMBNAIL, "");
                 mBD.insert(Noticies.NOM_TAULA, null, cv);
             }
