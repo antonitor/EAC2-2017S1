@@ -85,10 +85,10 @@ public class MarcaXmlParser {
             }
             //Obtenim el nom de l'etiqueta
             String name = parser.getName();
-            Log.d(LOG_TAG, "LLEGIT " + name +" TAG");
+            Log.d(LOG_TAG, "LLEGIT " + name +"CHANNEL TAG");
             // Si aquesta etiqueta és una entrada de noticia
             if (name.equals("item")) {
-                Log.d(LOG_TAG, "ITEM TAG");
+                Log.d(LOG_TAG, "_______LLEGIT "+ name +" TAG_________");
                 //Afegim l'entrada a la llista
                 llistaEntrades.add(llegirEntrada(parser));
             } else {
@@ -122,7 +122,7 @@ public class MarcaXmlParser {
 
             //Obtenim el nom de l'etiqueta
             String etiqueta = parser.getName();
-
+            Log.d(LOG_TAG, "LLEGIT "+ etiqueta +" TAG");
             switch (etiqueta) {
                 case "title":
                     titol = llegirTitol(parser);
@@ -130,10 +130,10 @@ public class MarcaXmlParser {
                 case "link":
                     enllac = llegirEnllac(parser);
                     break;
-                case "creator":
+                case "dc:creator":
                     autor = llegirAutor(parser);
                     break;
-                case "description":
+                case "media:description":
                     descripcio = llegirDescripcio(parser);
                     break;
                 case "pubDate":
@@ -142,7 +142,7 @@ public class MarcaXmlParser {
                 case "category":
                     categoria = llegirCategoria(parser);
                     break;
-                case "thumbnail":
+                case "media:thumbnail":
                     thumbnail = llegirThumbnail(parser);
                     break;
                 default:
@@ -151,7 +151,7 @@ public class MarcaXmlParser {
         }
 
         //Creem una nova entrada amb aquestes dades i la retornem
-        return new Noticia(titol, enllac, autor, descripcio, data, categoria, thumbnail);
+        return new Noticia(titol, autor, enllac, descripcio, data, categoria, thumbnail);
     }
 
     //Aquesta funció serveix per saltar-se una etiqueta i les seves subetiquetes aniuades.
@@ -188,7 +188,11 @@ public class MarcaXmlParser {
 
         //Fi d'etiqueta
         parser.require(XmlPullParser.END_TAG, ns, "title");
-        return titol;
+        if (titol!=null) {
+            return titol;
+        }else{
+            return "";
+        }
     }
 
     //Llegeix l'enllaç de una notícia del feed i el retorna com String
@@ -204,30 +208,42 @@ public class MarcaXmlParser {
         //Fi d'etiqueta
         parser.require(XmlPullParser.END_TAG, ns, "link");
 
-        return enllac;
+        if (enllac!=null) {
+            return enllac;
+        }else{
+            return "";
+        }
     }
 
     //Llegeix l'autor de una notícia del feed i el retorna com String
     private String llegirAutor(XmlPullParser parser) throws IOException, XmlPullParserException {
         //L'etiqueta actual ha de ser "summary"
-        parser.require(XmlPullParser.START_TAG, ns, "creator");
+        parser.require(XmlPullParser.START_TAG, ns, "dc:creator");
 
         String autor = llegeixText(parser);
 
-        parser.require(XmlPullParser.END_TAG, ns, "creator");
-        return autor;
+        parser.require(XmlPullParser.END_TAG, ns, "dc:creator");
+        if (autor!=null) {
+            return autor;
+        }else{
+            return "";
+        }
     }
 
     //Llegeix la descripció de una notícia del feed i el retorna com String
     private String llegirDescripcio(XmlPullParser parser) throws IOException, XmlPullParserException {
         //L'etiqueta actual ha de ser "summary"
-        String resum = "";
-        parser.require(XmlPullParser.START_TAG, ns, "description");
+        String descripcio = "";
+        parser.require(XmlPullParser.START_TAG, ns, "media:description");
 
-        resum = llegeixText(parser);
+        descripcio = llegeixText(parser);
 
-        parser.require(XmlPullParser.END_TAG, ns, "description");
-        return resum;
+        parser.require(XmlPullParser.END_TAG, ns, "media:description");
+        if (descripcio!=null) {
+            return descripcio;
+        }else{
+            return "";
+        }
     }
 
     //Llegeix la data de publicació de una notícia del feed i el retorna com String
@@ -235,10 +251,14 @@ public class MarcaXmlParser {
         //L'etiqueta actual ha de ser "summary"
         parser.require(XmlPullParser.START_TAG, ns, "pubDate");
 
-        String resum = llegeixText(parser);
+        String pubdate = llegeixText(parser);
 
         parser.require(XmlPullParser.END_TAG, ns, "pubDate");
-        return resum;
+        if (pubdate!=null) {
+            return pubdate;
+        }else{
+            return "";
+        }
     }
 
     //Llegeix la categoría de una notícia del feed i el retorna com String
@@ -246,10 +266,14 @@ public class MarcaXmlParser {
         //L'etiqueta actual ha de ser "summary"
         parser.require(XmlPullParser.START_TAG, ns, "category");
 
-        String resum = llegeixText(parser);
+        String category = llegeixText(parser);
 
         parser.require(XmlPullParser.END_TAG, ns, "category");
-        return resum;
+        if (category!=null) {
+            return category;
+        }else{
+            return "";
+        }
     }
 
     //Llegeix l'enllaç al thumbnail de l'imatge de una notícia del feed i el retorna com String
@@ -258,13 +282,17 @@ public class MarcaXmlParser {
         String thumbnail = "";
 
         //L'etiqueta actual ha de ser "thumbnail"
-        parser.require(XmlPullParser.START_TAG, ns, "thumbnail");
+        parser.require(XmlPullParser.START_TAG, ns, "media:thumbnail");
 
         thumbnail = parser.getAttributeValue(null, "url");
 
-        parser.require(XmlPullParser.END_TAG, ns, "thumbnail");
+        parser.nextTag();
 
-        return thumbnail;
+        if (thumbnail!=null) {
+            return thumbnail;
+        }else{
+            return "";
+        }
     }
 
 

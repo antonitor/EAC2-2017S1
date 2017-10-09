@@ -55,7 +55,6 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<A
         AjudaBD ajudaBD = new AjudaBD(this);
         mBD = ajudaBD.getReadableDatabase();
 
-        //fillWithFakeData();
         if (comprovaXarxa(this)) {
             LoaderCallbacks<ArrayList<Noticia>> callback = MainActivity.this;
             getSupportLoaderManager().initLoader(NOTICIES_LOADER_ID, null, callback);
@@ -65,6 +64,9 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<A
 
     }
 
+    private void cleanNoticiesTable() {
+        mBD.delete(Noticies.NOM_TAULA,null,null);
+    }
 
     private void fillRecyclerFromSQLite (Cursor cursor) {
         mAdapter = new NoticiesListAdapter(this, cursor);
@@ -103,20 +105,6 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<A
                 return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private long fillWithFakeData() {
-        ContentValues cv = new ContentValues();
-        cv.put(Noticies.TITOL, "Noticia Falsa per omplir el recycler");
-        cv.put(Noticies.AUTOR, "Pep");
-        cv.put(Noticies.DESCRIPCIO, "Tan sols és una noticia falsa");
-        cv.put(Noticies.DATA_PUBLICACIO, "08-10-2017");
-        cv.put(Noticies.CATEGORIA, "Noticies Falses");
-        cv.put(Noticies.ENLLAC, "www.noticia-falsa.fal");
-        cv.put(Noticies.THUMBNAIL, "");
-        mBD.insert(Noticies.NOM_TAULA,null,cv);
-        mBD.insert(Noticies.NOM_TAULA,null,cv);
-        return mBD.insert(Noticies.NOM_TAULA,null,cv);
     }
 
     @Override
@@ -165,6 +153,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<A
     public void onLoadFinished(Loader<ArrayList<Noticia>> loader, ArrayList<Noticia> data) {
         if (data != null) {
             Log.d(LOG_TAG, "Array empty: " + data.isEmpty());
+            cleanNoticiesTable();
             for (Noticia noticia : data) {
                 Log.d(LOG_TAG, noticia.titol);
                 ContentValues cv = new ContentValues();
@@ -172,12 +161,11 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<A
                 cv.put(Noticies.AUTOR, noticia.autor);
                 cv.put(Noticies.DESCRIPCIO, noticia.descripcio);
                 cv.put(Noticies.DATA_PUBLICACIO, noticia.data);
-                cv.put(Noticies.CATEGORIA, "");
-                cv.put(Noticies.ENLLAC, "");
-                cv.put(Noticies.THUMBNAIL, "");
+                cv.put(Noticies.CATEGORIA, noticia.categoria);
+                cv.put(Noticies.ENLLAC, noticia.enllac);
+                cv.put(Noticies.THUMBNAIL, noticia.thumbnail);
                 mBD.insert(Noticies.NOM_TAULA, null, cv);
             }
-
         }
         fillRecyclerFromSQLite(getNoticies());
     }

@@ -38,5 +38,6 @@ public class AjudaBD extends SQLiteOpenHelper{
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + Noticies.NOM_TAULA);
         onCreate(sqLiteDatabase);
     }
+
 }
 
