@@ -22,8 +22,6 @@ import static cat.xtec.ioc.eac2_2017s1.MainActivity.LOG_TAG;
 
 public class NetworkUtils {
 
-    public static final String sUrl = "http://estaticos.marca.com/rss/portada.xml";
-
     public static InputStream getResponseFromHttpUrl(URL url) throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         int resposta = -1;
@@ -56,11 +54,18 @@ public class NetworkUtils {
         ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
-            Toast.makeText(context,"Xarxa ok", Toast.LENGTH_LONG).show();
             return true;
         } else {
-            Toast.makeText(context,"Xarxa no disponible", Toast.LENGTH_LONG).show();
+            Toast.makeText(context,"No hi ha connexió!!", Toast.LENGTH_LONG).show();
             return false;
+        }
+    }
+
+    public static void closeInputStream (InputStream in) {
+        try {
+            in.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

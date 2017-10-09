@@ -10,19 +10,22 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 import cat.xtec.ioc.eac2_2017s1.R;
 import cat.xtec.ioc.eac2_2017s1.data.Contracte.Noticies;
+import cat.xtec.ioc.eac2_2017s1.utils.MarcaXmlParser.Noticia;
 /**
  * Created by Toni on 08/10/2017.
  */
 
 public class NoticiesListAdapter extends RecyclerView.Adapter<NoticiesListAdapter.NoticiaHolder>{
 
-    private Cursor mCursor;
+    private ArrayList<Noticia> mNoticiesList;
     private Context mContext;
-    public NoticiesListAdapter(Context context, Cursor cursor) {
+    public NoticiesListAdapter(Context context) {
         this.mContext = context;
-        this.mCursor = cursor;
     }
 
     @Override
@@ -35,36 +38,27 @@ public class NoticiesListAdapter extends RecyclerView.Adapter<NoticiesListAdapte
     @Override
     public void onBindViewHolder(NoticiaHolder holder, int position) {
 
-        if (!mCursor.moveToPosition(position)) {
-            return;
-        }
-
-        String thumnail = mCursor.getString(mCursor.getColumnIndex(Noticies.THUMBNAIL));
-        String titol = mCursor.getString(mCursor.getColumnIndex(Noticies.TITOL));
-        long id = mCursor.getLong(mCursor.getColumnIndex(Noticies._ID));
+        String thumnail = ((Noticia )mNoticiesList.get(position)).thumbnail;
+        String titol = ((Noticia )mNoticiesList.get(position)).titol;
 
         //if (thumnail.length()>0) {
         //    holder.thumbnailImageView.setImageURI(Uri.parse(thumnail));
         //} else {
-            holder.thumbnailImageView.setImageResource(R.drawable.nofound);
+        holder.thumbnailImageView.setImageResource(R.drawable.nofound);
         //}
-
         holder.titolNoticiaTextView.setText(titol);
-        holder.itemView.setTag(id);
 
     }
 
-    public void swapCursor(Cursor newCursor) {
-        if (mCursor != null) mCursor.close();
-        mCursor = newCursor;
-        if (newCursor != null) {
-            this.notifyDataSetChanged();
-        }
+    public void setNoticiesList(ArrayList<Noticia> novesNoticies) {
+        mNoticiesList = novesNoticies;
+        this.notifyDataSetChanged();
     }
 
     @Override
     public int getItemCount() {
-        return mCursor.getCount();
+        if (null == mNoticiesList) return 0;
+        return mNoticiesList.size();
     }
 
     class NoticiaHolder extends RecyclerView.ViewHolder{
