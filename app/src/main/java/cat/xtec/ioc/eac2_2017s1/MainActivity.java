@@ -4,12 +4,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.NetworkRequest;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.AsyncTaskLoader;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,8 +17,6 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,7 +37,8 @@ public class MainActivity extends AppCompatActivity {
     private final String MARCA_URL = "http://estaticos.marca.com/rss/portada.xml";
 
     private NoticiesListAdapter mAdapter;
-    private SQLiteDatabase mBD;
+    AjudaBD mAjudaBD;
+    SQLiteDatabase mDB;
     private RecyclerView mNoticiesRecyclerView;
     private ProgressBar mLoadingIndicator;
     private TextView mErrorMessageDisplay;
@@ -66,8 +61,7 @@ public class MainActivity extends AppCompatActivity {
         mContext = this;
 
 
-        AjudaBD ajudaBD = new AjudaBD(this);
-        mBD = ajudaBD.getReadableDatabase();
+        mAjudaBD = new AjudaBD(this);
         mAdapter = new NoticiesListAdapter(this);
         mNoticiesRecyclerView.setAdapter(mAdapter);
         loadNoticies();
@@ -79,8 +73,7 @@ public class MainActivity extends AppCompatActivity {
         if (comprovaXarxa(this)) {
             new FetchNoticiesTask().execute(MARCA_URL);
         } else {
-            Cursor cursor = getNoticiesCursorFromDB();
-            mLlistaNoticies = loadLlistaNoticiesFromDB(cursor);
+            mLlistaNoticies = loadLlistaNoticiesFromDB();
             mAdapter.setNoticiesList(mLlistaNoticies);
         }
     }
@@ -158,8 +151,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private Cursor getNoticiesCursorFromDB() {
-        return mBD.query(
+
+    private ArrayList<Noticia> loadLlistaNoticiesFromDB() {
+        mDB = mAjudaBD.getReadableDatabase();
+        Cursor cursor = mDB.query(
                 Noticies.NOM_TAULA,
                 null,
                 null,
@@ -168,24 +163,21 @@ public class MainActivity extends AppCompatActivity {
                 null,
                 null
         );
-    }
-
-    private ArrayList<Noticia> loadLlistaNoticiesFromDB(Cursor cursor) {
 
         ArrayList<Noticia> llista = new ArrayList<Noticia>();
-        cursor.moveToFirst();
-
-        while (cursor.moveToNext()) {
-            String title = cursor.getString(cursor.getColumnIndex(Noticies.TITOL));
-            String author = cursor.getString(cursor.getColumnIndex(Noticies.TITOL));
-            String link = cursor.getString(cursor.getColumnIndex(Noticies.TITOL));
-            String desc = cursor.getString(cursor.getColumnIndex(Noticies.TITOL));
-            String date = cursor.getString(cursor.getColumnIndex(Noticies.TITOL));
-            String category = cursor.getString(cursor.getColumnIndex(Noticies.TITOL));
-            String thumb = cursor.getString(cursor.getColumnIndex(Noticies.THUMBNAIL));
-            llista.add(new Noticia(title, author, link, desc, date, category, thumb));
+        if (cursor.moveToFirst()) {
+             do {
+                String title = cursor.getString(cursor.getColumnIndex(Noticies.TITOL));
+                String author = cursor.getString(cursor.getColumnIndex(Noticies.TITOL));
+                String link = cursor.getString(cursor.getColumnIndex(Noticies.TITOL));
+                String desc = cursor.getString(cursor.getColumnIndex(Noticies.TITOL));
+                String date = cursor.getString(cursor.getColumnIndex(Noticies.TITOL));
+                String category = cursor.getString(cursor.getColumnIndex(Noticies.TITOL));
+                String thumb = cursor.getString(cursor.getColumnIndex(Noticies.THUMBNAIL));
+                llista.add(new Noticia(title, author, link, desc, date, category, thumb));
+            }while (cursor.moveToNext());
         }
-        Log.d(LOG_TAG, "Mida de llista extraiguda de la BD: " + llista.size());
+        mDB.close();
         return llista;
     }
 
@@ -200,12 +192,17 @@ public class MainActivity extends AppCompatActivity {
             cv.put(Noticies.CATEGORIA, noticia.categoria);
             cv.put(Noticies.ENLLAC, noticia.enllac);
             cv.put(Noticies.THUMBNAIL, noticia.thumbnail);
-            mBD.insert(Noticies.NOM_TAULA, null, cv);
+
+            mDB = mAjudaBD.getWritableDatabase();
+            mDB.insert(Noticies.NOM_TAULA, null, cv);
+            mDB.close();
         }
     }
 
     private void cleanNoticiesTable() {
-        mBD.delete(Noticies.NOM_TAULA,null,null);
+        mDB = mAjudaBD.getWritableDatabase();
+        mDB.delete(Noticies.NOM_TAULA,null,null);
+        mDB.close();
     }
 
     private void showErrorMessage() {
