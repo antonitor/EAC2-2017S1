@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import cat.xtec.ioc.eac2_2017s1.data.AjudaBD;
 import cat.xtec.ioc.eac2_2017s1.data.Contracte.Noticies;
@@ -218,10 +219,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void descarregaImatgesCache() {
-        for (int i = 0; i < mLlistaNoticies.size(); i++) {
-            String path_imatge = mCacheDir + "/imatge" + i;
-            NetworkUtils.downloadImageToCache(mLlistaNoticies.get(i).thumbnail, path_imatge);
-            mLlistaNoticies.get(i).thumbnail=path_imatge;
+        for (Noticia noticia : mLlistaNoticies) {
+            String path_imatge = mCacheDir + UUID.randomUUID().toString().replace("-","");
+            NetworkUtils.downloadImageToCache(noticia.thumbnail, path_imatge);
+            noticia.thumbnail=path_imatge;
         }
     }
 

@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.FileNotFoundException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
@@ -42,12 +43,12 @@ public class NoticiesListAdapter extends RecyclerView.Adapter<NoticiesListAdapte
         String thumnail = ((Noticia )mNoticiesList.get(position)).thumbnail;
         String titol = ((Noticia )mNoticiesList.get(position)).titol;
 
-        //if (thumnail.length()>0) {
-        //    holder.thumbnailImageView.setImageURI(Uri.parse(thumnail));
-        //} else {
-        holder.thumbnailImageView.setImageDrawable(Drawable.createFromPath(thumnail));
-        //holder.thumbnailImageView.setImageResource(R.drawable.nofound);
-        //}
+        try {
+            holder.thumbnailImageView.setImageDrawable(Drawable.createFromPath(thumnail));
+        } catch (Exception fnfe) {
+            holder.thumbnailImageView.setImageResource(R.drawable.nofound);
+        }
+
         holder.titolNoticiaTextView.setText(titol);
 
     }
