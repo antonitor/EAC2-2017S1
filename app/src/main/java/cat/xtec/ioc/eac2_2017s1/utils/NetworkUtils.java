@@ -6,8 +6,10 @@ import android.net.NetworkInfo;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -38,6 +40,35 @@ public class NetworkUtils {
             return null;
         }
     }
+
+    public static void downloadImageToCache(String urlString, String path_imatge){
+        URL urlImatge = buildURl(urlString);
+        InputStream inputStream = null;
+        try {
+            HttpURLConnection connection = (HttpURLConnection) urlImatge.openConnection();
+            int totalImatge= connection.getContentLength();
+            InputStream inputstream = (InputStream) urlImatge.getContent();
+            byte[] bufferImatge = new byte[1024];
+
+            OutputStream outputstream = new FileOutputStream(path_imatge);
+
+            int descarregat = 0;
+            int count;
+
+            // Mentre hi hagi informació que llegir
+            while ((count = inputstream.read(bufferImatge)) != -1) {
+                // Acumulem tot el que ha llegit
+                descarregat += count;
+                // Guardem al disc el que hem descarregat
+                outputstream.write(bufferImatge, 0, count);
+            }
+            inputstream.close();
+            outputstream.close();
+        } catch (IOException exception) {
+            Log.d(LOG_TAG, "Alguna cosa no ha anat bé!");
+        }
+    }
+
 
     public static URL buildURl(String url) {
 

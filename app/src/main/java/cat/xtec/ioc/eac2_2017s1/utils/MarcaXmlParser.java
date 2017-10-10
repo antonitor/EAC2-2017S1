@@ -30,7 +30,7 @@ public class MarcaXmlParser {
         public final String descripcio;     //Descripció de la noticia
         public final String data;           //Data de publicació de la noticia
         public final String categoria;      //Categoria de la noticia
-        public final String thumbnail;      //Enllaç al thumbnail de la imatge
+        public String thumbnail;      //Enllaç al thumbnail de la imatge
 
 
         public Noticia(String title, String author, String link, String desc, String date, String cat, String thumb) {

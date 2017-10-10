@@ -2,6 +2,7 @@ package cat.xtec.ioc.eac2_2017s1.utils;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -44,7 +45,8 @@ public class NoticiesListAdapter extends RecyclerView.Adapter<NoticiesListAdapte
         //if (thumnail.length()>0) {
         //    holder.thumbnailImageView.setImageURI(Uri.parse(thumnail));
         //} else {
-        holder.thumbnailImageView.setImageResource(R.drawable.nofound);
+        holder.thumbnailImageView.setImageDrawable(Drawable.createFromPath(thumnail));
+        //holder.thumbnailImageView.setImageResource(R.drawable.nofound);
         //}
         holder.titolNoticiaTextView.setText(titol);
 

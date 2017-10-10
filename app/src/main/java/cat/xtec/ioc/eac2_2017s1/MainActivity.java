@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
     private final String MARCA_URL = "http://estaticos.marca.com/rss/portada.xml";
 
+    private String mCacheDir;
     private NoticiesListAdapter mAdapter;
     AjudaBD mAjudaBD;
     SQLiteDatabase mDB;
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
         mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
         mErrorMessageDisplay = (TextView) findViewById(R.id.tv_error_message_display);
         mContext = this;
+        mCacheDir  = this.getCacheDir().toString();
 
 
         mAjudaBD = new AjudaBD(this);
@@ -125,11 +127,11 @@ public class MainActivity extends AppCompatActivity {
             }
 
             try {
-                ArrayList<Noticia> llista = (ArrayList<Noticia>) new MarcaXmlParser().analitza(inputStream);
-                mLlistaNoticies = llista;
-                storeNoticesOnDB(llista);
-                Log.d(LOG_TAG, "Exit en doInBackgroud. Noticies list size: " + llista.size());
-                return llista;
+                mLlistaNoticies= (ArrayList<Noticia>) new MarcaXmlParser().analitza(inputStream);
+                descarregaImatgesCache();
+                storeNoticesOnDB(mLlistaNoticies);
+                Log.d(LOG_TAG, "Exit doInBackgroud. Noticies list size: " + mLlistaNoticies.size());
+                return mLlistaNoticies;
             } catch (Exception e) {
                 Log.d(LOG_TAG, "Error doInBackground");
                 e.printStackTrace();
@@ -213,6 +215,14 @@ public class MainActivity extends AppCompatActivity {
     private void showNoticiesView() {
         mErrorMessageDisplay.setVisibility(View.INVISIBLE);
         mNoticiesRecyclerView.setVisibility(View.VISIBLE);
+    }
+
+    private void descarregaImatgesCache() {
+        for (int i = 0; i < mLlistaNoticies.size(); i++) {
+            String path_imatge = mCacheDir + "/imatge" + i;
+            NetworkUtils.downloadImageToCache(mLlistaNoticies.get(i).thumbnail, path_imatge);
+            mLlistaNoticies.get(i).thumbnail=path_imatge;
+        }
     }
 
 }
