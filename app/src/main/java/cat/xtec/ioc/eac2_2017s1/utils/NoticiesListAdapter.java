@@ -43,9 +43,9 @@ public class NoticiesListAdapter extends RecyclerView.Adapter<NoticiesListAdapte
         String thumnail = ((Noticia )mNoticiesList.get(position)).thumbnail;
         String titol = ((Noticia )mNoticiesList.get(position)).titol;
 
-        try {
+        if (Drawable.createFromPath(thumnail)!=null){
             holder.thumbnailImageView.setImageDrawable(Drawable.createFromPath(thumnail));
-        } catch (Exception fnfe) {
+        } else {
             holder.thumbnailImageView.setImageResource(R.drawable.nofound);
         }
 
