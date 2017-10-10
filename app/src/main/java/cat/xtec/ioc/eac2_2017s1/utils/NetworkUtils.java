@@ -25,7 +25,6 @@ public class NetworkUtils {
     public static InputStream getResponseFromHttpUrl(URL url) throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         int resposta = -1;
-        Log.d(LOG_TAG, "HTTPURLCONNECTION");
         try {
             resposta = urlConnection.getResponseCode();
             Log.d(LOG_TAG, "HTTP Response Code: " + resposta);

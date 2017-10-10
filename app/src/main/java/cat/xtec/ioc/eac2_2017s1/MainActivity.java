@@ -1,6 +1,7 @@
 package cat.xtec.ioc.eac2_2017s1;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.NetworkRequest;
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar mLoadingIndicator;
     private TextView mErrorMessageDisplay;
     private ArrayList<Noticia> mLlistaNoticies;
+    private Context mContext;
     public final static String LOG_TAG = "TESTING -------->>>>>  ";
 
     @Override
@@ -61,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
         mNoticiesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
         mErrorMessageDisplay = (TextView) findViewById(R.id.tv_error_message_display);
+        mContext = this;
 
 
         AjudaBD ajudaBD = new AjudaBD(this);
@@ -82,9 +85,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void cleanNoticiesTable() {
-        mBD.delete(Noticies.NOM_TAULA,null,null);
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -119,7 +119,6 @@ public class MainActivity extends AppCompatActivity {
         protected ArrayList<Noticia> doInBackground(String... params) {
 
             if (params.length==0) {
-                Log.d(LOG_TAG, "Error doInBackground");
                 return null;
             }
 
@@ -128,7 +127,8 @@ public class MainActivity extends AppCompatActivity {
             try {
                 inputStream = NetworkUtils.getResponseFromHttpUrl(url);
             } catch (IOException ioe){
-                Log.d(LOG_TAG, "Error de connexió.");
+                Toast.makeText(mContext, "Error de connexió", Toast.LENGTH_SHORT).show();
+                return null;
             }
 
             try {
@@ -150,11 +150,9 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(ArrayList<Noticia> noticies) {
             mLoadingIndicator.setVisibility(View.INVISIBLE);
             if (noticies != null) {
-                Log.d(LOG_TAG, "Extito onPostExecute! Noticies.size: " + noticies.size());
                 showNoticiesView();
                 mAdapter.setNoticiesList(noticies);
             } else {
-                Log.d(LOG_TAG, "FAIL onPostExecute!!");
                 showErrorMessage();
             }
         }
@@ -187,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
             String thumb = cursor.getString(cursor.getColumnIndex(Noticies.THUMBNAIL));
             llista.add(new Noticia(title, author, link, desc, date, category, thumb));
         }
-        Log.d(LOG_TAG, "Mida de llista extreta de la BD:" + llista.size());
+        Log.d(LOG_TAG, "Mida de llista extraiguda de la BD: " + llista.size());
         return llista;
     }
 
@@ -206,6 +204,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void cleanNoticiesTable() {
+        mBD.delete(Noticies.NOM_TAULA,null,null);
+    }
 
     private void showErrorMessage() {
         mNoticiesRecyclerView.setVisibility(View.INVISIBLE);
