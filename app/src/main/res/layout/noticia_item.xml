@@ -7,12 +7,14 @@
         android:id="@+id/thumbnail_image_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="8"/>
+        android:layout_margin="3dp"
+        android:layout_weight="8" />
 
     <TextView
         android:id="@+id/titol_noticia_text_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_margin="3dp"
         android:layout_weight="5"
         android:gravity="center_vertical"
         android:paddingLeft="20dp" />
