@@ -213,11 +213,11 @@ public class MainActivity extends AppCompatActivity implements NoticiesListAdapt
         if (cursor.moveToFirst()) {
              do {
                 String title = cursor.getString(cursor.getColumnIndex(Noticies.TITOL));
-                String author = cursor.getString(cursor.getColumnIndex(Noticies.TITOL));
-                String link = cursor.getString(cursor.getColumnIndex(Noticies.TITOL));
-                String desc = cursor.getString(cursor.getColumnIndex(Noticies.TITOL));
-                String date = cursor.getString(cursor.getColumnIndex(Noticies.TITOL));
-                String category = cursor.getString(cursor.getColumnIndex(Noticies.TITOL));
+                String author = cursor.getString(cursor.getColumnIndex(Noticies.AUTOR));
+                String link = cursor.getString(cursor.getColumnIndex(Noticies.ENLLAC));
+                String desc = cursor.getString(cursor.getColumnIndex(Noticies.DESCRIPCIO));
+                String date = cursor.getString(cursor.getColumnIndex(Noticies.DATA_PUBLICACIO));
+                String category = cursor.getString(cursor.getColumnIndex(Noticies.CATEGORIA));
                 String thumb = cursor.getString(cursor.getColumnIndex(Noticies.THUMBNAIL));
                 llista.add(new Noticia(title, author, link, desc, date, category, thumb));
             }while (cursor.moveToNext());

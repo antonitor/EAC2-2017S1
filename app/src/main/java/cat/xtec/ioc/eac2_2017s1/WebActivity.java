@@ -29,7 +29,7 @@ public class WebActivity extends AppCompatActivity {
             webview.loadUrl(mLink);
         } else {
             String summary = buildHtmlNoticia();
-            webview.loadData(summary, "text/html", null);
+            webview.loadData(summary, "text/html; charset=UTF-8", null);
         }
     }
 
@@ -41,10 +41,13 @@ public class WebActivity extends AppCompatActivity {
 
         StringBuilder sBuilder = new StringBuilder();
         sBuilder.append("<html><body>");
-        sBuilder.append("<h1>"+ mTitle +"</h1>");
+        sBuilder.append("<h3>"+ mTitle +"</h3>");
+        sBuilder.append("<hr />");
         sBuilder.append("<p>"+ descripcio +"</p>");
-        sBuilder.append("<p>"+ autor +"</p>");
-        sBuilder.append("<p><b>Categoria: </b>"+ categoria +"</p>");
+        sBuilder.append("<hr />");
+        sBuilder.append("<p  align=\"right\"><i>"+ autor +"</i></p>");
+        sBuilder.append("<hr />");
+        sBuilder.append("<p><b>Categories: </b>"+ categoria +"</p>");
         sBuilder.append("<p>"+ data +"</p>");
         sBuilder.append("</html></body>");
         return sBuilder.toString();
