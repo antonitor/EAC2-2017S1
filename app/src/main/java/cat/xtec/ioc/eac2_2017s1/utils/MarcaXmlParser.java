@@ -83,7 +83,7 @@ public class MarcaXmlParser {
         String autor = null;
         String descripcio = null;
         String data = null;
-        String categoria = null;
+        String categoria = "";
         String thumbnail = null;
 
         //L'etiqueta actual ha de ser "item"
@@ -109,13 +109,17 @@ public class MarcaXmlParser {
                     autor = llegirAutor(parser);
                     break;
                 case "media:description":
-                    descripcio = llegirDescripcio(parser);
+                    descripcio = llegirDescripcio(parser).replaceAll("\\<[^>]*>","");
                     break;
                 case "pubDate":
                     data = llegirData(parser);
                     break;
                 case "category":
-                    categoria = llegirCategoria(parser);
+                    if (categoria.length()>0) {
+                        categoria = llegirCategoria(parser) + ", " + categoria;
+                    } else {
+                        categoria = llegirCategoria(parser);
+                    }
                     break;
                 case "media:thumbnail":
                     thumbnail = llegirThumbnail(parser);
@@ -222,9 +226,11 @@ public class MarcaXmlParser {
     //Llegeix la data de publicació de una notícia del feed i el retorna com String
     private String llegirData(XmlPullParser parser) throws IOException, XmlPullParserException {
         //L'etiqueta actual ha de ser "summary"
+        String pubdate = "";
+
         parser.require(XmlPullParser.START_TAG, ns, "pubDate");
 
-        String pubdate = llegeixText(parser);
+        pubdate = llegeixText(parser);
 
         parser.require(XmlPullParser.END_TAG, ns, "pubDate");
 
@@ -234,9 +240,10 @@ public class MarcaXmlParser {
     //Llegeix la categoría de una notícia del feed i el retorna com String
     private String llegirCategoria(XmlPullParser parser) throws IOException, XmlPullParserException {
         //L'etiqueta actual ha de ser "summary"
+        String category = "";
         parser.require(XmlPullParser.START_TAG, ns, "category");
 
-        String category = llegeixText(parser);
+        category = llegeixText(parser);
 
         parser.require(XmlPullParser.END_TAG, ns, "category");
         return category;
