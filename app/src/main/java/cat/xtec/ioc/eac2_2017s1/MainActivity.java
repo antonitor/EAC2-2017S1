@@ -2,6 +2,7 @@ package cat.xtec.ioc.eac2_2017s1;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -22,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.UUID;
 
 import cat.xtec.ioc.eac2_2017s1.data.AjudaBD;
 import cat.xtec.ioc.eac2_2017s1.data.Contracte.Noticies;
@@ -33,7 +34,7 @@ import cat.xtec.ioc.eac2_2017s1.data.Noticia;
 
 import static cat.xtec.ioc.eac2_2017s1.utils.NetworkUtils.comprovaXarxa;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NoticiesListAdapter.NoticiesListAdapterOnClickHandler, SearchView.OnQueryTextListener {
 
     private final String MARCA_URL = "http://estaticos.marca.com/rss/portada.xml";
 
@@ -58,16 +59,17 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         mNoticiesRecyclerView = (RecyclerView) findViewById(R.id.noticies_recycler_view);
+        mNoticiesRecyclerView.setHasFixedSize(true);
         mNoticiesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
         mErrorMessageDisplay = (TextView) findViewById(R.id.tv_error_message_display);
         mContext = this;
         mCacheDir  = this.getCacheDir().toString();
 
-
         mAjudaBD = new AjudaBD(this);
-        mAdapter = new NoticiesListAdapter(this);
+        mAdapter = new NoticiesListAdapter(this, this);
         mNoticiesRecyclerView.setAdapter(mAdapter);
+
         loadNoticies();
     }
 
@@ -90,6 +92,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
+
+        final MenuItem searchItem = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener(this);
+
         return true;
     }
 
@@ -105,6 +112,36 @@ public class MainActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(Noticia noticia) {
+        Intent intent = new Intent(this, WebActivity.class);
+        intent.putExtra("titol", noticia.getTitol());
+        intent.putExtra("descripcio", noticia.getDescripcio());
+        intent.putExtra("categoria", noticia.getCategoria());
+        intent.putExtra("autor", noticia.getAutor());
+        intent.putExtra("data", noticia.getData());
+        intent.putExtra("enllac", noticia.getEnllac());
+        startActivity(intent);
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return onQueryTextChange(query);
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        newText = newText.toLowerCase();
+        ArrayList<Noticia> llistaNoticiesFiltrada = new ArrayList<Noticia>();
+        for (Noticia noticia : mLlistaNoticies) {
+            if (noticia.getTitol().toLowerCase().contains(newText)) {
+                llistaNoticiesFiltrada.add(noticia);
+            }
+        }
+        mAdapter.setNoticiesList(llistaNoticiesFiltrada);
+        return true;
     }
 
 

@@ -21,8 +21,16 @@ public class NoticiesListAdapter extends RecyclerView.Adapter<NoticiesListAdapte
 
     private ArrayList<Noticia> mNoticiesList;
     private Context mContext;
-    public NoticiesListAdapter(Context context) {
+    private final NoticiesListAdapterOnClickHandler mClickHandler;
+
+
+    public interface NoticiesListAdapterOnClickHandler {
+        void onClick(Noticia noticia);
+    }
+
+    public NoticiesListAdapter(Context context, NoticiesListAdapterOnClickHandler mClickHandler) {
         this.mContext = context;
+        this.mClickHandler = mClickHandler;
     }
 
     @Override
@@ -59,7 +67,7 @@ public class NoticiesListAdapter extends RecyclerView.Adapter<NoticiesListAdapte
         return mNoticiesList.size();
     }
 
-    class NoticiaHolder extends RecyclerView.ViewHolder{
+    class NoticiaHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         ImageView thumbnailImageView;
         TextView titolNoticiaTextView;
@@ -68,6 +76,14 @@ public class NoticiesListAdapter extends RecyclerView.Adapter<NoticiesListAdapte
             super(itemView);
             thumbnailImageView = (ImageView) itemView.findViewById(R.id.thumbnail_image_view);
             titolNoticiaTextView = (TextView) itemView.findViewById(R.id.titol_noticia_text_view);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            int adapterPosition = getAdapterPosition();
+            Noticia noticia = mNoticiesList.get(adapterPosition);
+            mClickHandler.onClick(noticia);
         }
     }
 }
