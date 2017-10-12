@@ -205,12 +205,23 @@ public class MainActivity extends AppCompatActivity implements NoticiesListAdapt
      */
     private class DownloadNoticiesTask extends AsyncTask<String, Void, ArrayList<Noticia>> {
 
+        /**
+         * Abans de començar la tasca en segón plà mostra la barra de progrés
+         */
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             mLoadingIndicator.setVisibility(View.VISIBLE);
         }
 
+        /**
+         * En aquest fil d'execució primer prova de conectar amb la url mitjançant un request
+         * http. Aquest InputStream es passa al XmlParser per que en rebi l'arxiu xml, el
+         * interpreti y ens torni un ArrayList de Noticies. A continuació es descarreguen els
+         * thumbnails al cache i es guarden les noticies a la base de dades.
+         * @param params array de Strings que conté la URL a la primera posició
+         * @return un ArrayList<Noticia> amb les noticies interpretades al XML
+         */
         @Override
         protected ArrayList<Noticia> doInBackground(String... params) {
 
@@ -242,6 +253,11 @@ public class MainActivity extends AppCompatActivity implements NoticiesListAdapt
             }
         }
 
+        /**
+         * En acabar aquest fil s'amaga la barra de progrés, es mostra el RecyclerView i s'omple
+         * el recyclerView de noticies amb el mètode setNoticiesList del adaptador
+         * @param noticies
+         */
         @Override
         protected void onPostExecute(ArrayList<Noticia> noticies) {
             mLoadingIndicator.setVisibility(View.INVISIBLE);
@@ -255,6 +271,12 @@ public class MainActivity extends AppCompatActivity implements NoticiesListAdapt
     }
 
 
+    /**
+     * Mitjançant un query sense sentencia WHERE obté un cursor amb totes les columnes i tots
+     * els registres de la taula Noticies de la base de dades.
+     * A continuació emmagatzema les noticies en un nou ArrayList<Noticia>
+     * @return una nova llista de noticies extretes de la base de dades
+     */
     private ArrayList<Noticia> loadLlistaNoticiesFromDB() {
         mDB = mAjudaBD.getReadableDatabase();
         Cursor cursor = mDB.query(
@@ -284,6 +306,11 @@ public class MainActivity extends AppCompatActivity implements NoticiesListAdapt
         return llista;
     }
 
+    /**
+     * Buida la taula Noticies de la nostra base de dades per, a continuació,
+     * emmagatzemar-hi una nova llista de noticies.
+     * @param noticies ArrayList de Noticies a emmagatzemar a la base de dades
+     */
     private void storeNoticesOnDB( ArrayList<Noticia> noticies){
         cleanNoticiesTable();
         for (Noticia noticia : noticies) {
@@ -302,22 +329,36 @@ public class MainActivity extends AppCompatActivity implements NoticiesListAdapt
         }
     }
 
+    /**
+     * Buida la taula Noticies de la nostra base de dades
+     */
     private void cleanNoticiesTable() {
         mDB = mAjudaBD.getWritableDatabase();
         mDB.delete(Noticies.NOM_TAULA,null,null);
         mDB.close();
     }
 
+    /**
+     * Mostra el missatge d'error i amaga el RecyclerView
+     */
     private void showErrorMessage() {
         mNoticiesRecyclerView.setVisibility(View.INVISIBLE);
         mErrorMessageDisplay.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Mostra el RecyclerView i amaga el missatge d'error
+     */
     private void showNoticiesView() {
         mErrorMessageDisplay.setVisibility(View.INVISIBLE);
         mNoticiesRecyclerView.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Recorre la llista de noticies, i per cada Url al atribut Thumbnail, truca el mètode
+     * downloadImageToCache de la nostra clase d'utilitats, per tal d'emmagatzemar al caché
+     * el Thumbnail.
+     */
     private void downloadImagesToCache() {
         int count = 1;
         for (Noticia noticia : mLlistaNoticies) {
