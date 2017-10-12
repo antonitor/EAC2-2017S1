@@ -34,6 +34,12 @@ import cat.xtec.ioc.eac2_2017s1.data.Noticia;
 
 import static cat.xtec.ioc.eac2_2017s1.utils.NetworkUtils.comprovaXarxa;
 
+/**
+ * L'Activity principal implementa la interfície NoticiesListAdapterOnClickHandler per tal obligar a l'implementació del mètode onClick
+ * que rep un objecte tipus Noticia corresponent al item clickat.
+ * Implementa també OnQueryTextListener que obliga a l'implementació dels mètodes que actualitzen el recyclerView així com s'insereix
+ * text al quadre de búsqueda SearchView.
+ */
 public class MainActivity extends AppCompatActivity implements NoticiesListAdapter.NoticiesListAdapterOnClickHandler, SearchView.OnQueryTextListener {
 
     private final String MARCA_URL = "http://estaticos.marca.com/rss/portada.xml";
@@ -58,21 +64,37 @@ public class MainActivity extends AppCompatActivity implements NoticiesListAdapt
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //Obtenim una variable amb la referencia al RecyclerView del layout content_view
         mNoticiesRecyclerView = (RecyclerView) findViewById(R.id.noticies_recycler_view);
+        //Si sabem que les dimensions del RecyclerView no han de canviar en millorem el rendiemnt
+        //amb aquest mètode.
         mNoticiesRecyclerView.setHasFixedSize(true);
         mNoticiesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
+        //En cas d'error al carregar les dades al RecyclerView mostrarem aquest missatge d'error
         mErrorMessageDisplay = (TextView) findViewById(R.id.tv_error_message_display);
         mContext = this;
+        //Ruta al directori caché d'aquesta aplicació
         mCacheDir  = this.getCacheDir().toString();
 
+        //Instància de la nostra classe que hereta de SQLiteOpenHelper
         mAjudaBD = new AjudaBD(this);
+        //L'adapter pel recyclerView que agafa com a paràmetre el Context i el Listener
         mAdapter = new NoticiesListAdapter(this, this);
         mNoticiesRecyclerView.setAdapter(mAdapter);
 
         loadNoticies();
     }
 
+    /**
+     * Aquest mètode comprova si tenim conexió, sí és així llença la tasca que descarrega el xml
+     * d'internet, el pasa pel XMLPullParser i en retorna un ArrayList amb les Noticies.
+     *
+     * Si no hi ha internet i és el primer cop que engeguem l'aplicació, prova de carregar les
+     * noticies de la base de dades SQLite, pro si l'aplicació ja ha carregat noticies abans
+     * tan sols mostra un missatge advertint que no hi ha connexió i no fa res mes. Tal i com
+     * demana l'enunciat del EAC.
+     */
     private void loadNoticies() {
         showNoticiesView();
         if (comprovaXarxa(this)) {
@@ -88,7 +110,13 @@ public class MainActivity extends AppCompatActivity implements NoticiesListAdapt
         }
     }
 
-
+    /**
+     * Carrega el menú al ActionBar i hi afegeix un SearchView amb un listener per tal de
+     * d'actualitzar el RecyclerView així com s'insereix text
+     *
+     * @param menu menú a inflar
+     * @return true
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
@@ -100,13 +128,16 @@ public class MainActivity extends AppCompatActivity implements NoticiesListAdapt
         return true;
     }
 
+    /**
+     * Quan es sel·lecciona l'opció del menú de refrescar truca el mètode loadNoticies()
+     *
+     * @param item el item premut
+     * @return true si s'ha premut l'ítem action_refresh
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id) {
-            case R.id.action_search:
-                Toast.makeText(this,"SEARCH!",Toast.LENGTH_SHORT).show();
-                return true;
             case R.id.action_refresh:
                 loadNoticies();
                 return true;
@@ -114,6 +145,12 @@ public class MainActivity extends AppCompatActivity implements NoticiesListAdapt
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Mètode implementat de l'interfície NoticiesListAdapterOnClickHandler que s'encarrega
+     * de llençar l'Activity WebActivity amb tots els components que forment una noticia.
+     *
+     * @param noticia objecte Noticia corresponent al ítem clickat al recyclerView
+     */
     @Override
     public void onClick(Noticia noticia) {
         Intent intent = new Intent(this, WebActivity.class);
@@ -126,11 +163,29 @@ public class MainActivity extends AppCompatActivity implements NoticiesListAdapt
         startActivity(intent);
     }
 
+    /**
+     * Mètode implementat degut a l'implementació de l'interfície OnQueryTextListener en aquesta
+     * classe. Truca el mètode onQueryTextChange passant el parametre query amb la el text inerit
+     * al SearchView.
+     *
+     * @param query text inserit al SearchView
+     * @return
+     */
     @Override
     public boolean onQueryTextSubmit(String query) {
         return onQueryTextChange(query);
     }
 
+    /**
+     * Mètode implementat degut a l'implementació de l'interfície OnQueryTextListener en aquesta
+     * classe.
+     *
+     * Crea una nova llista de noticies, l'omple amb aquelles que contenen el text inserit al
+     * SearchView i la pasa al mètode setNoticiesList() que actualitza el contingut del RecyclerView
+     *
+     * @param newText text inserit al SearchView
+     * @return true
+     */
     @Override
     public boolean onQueryTextChange(String newText) {
         newText = newText.toLowerCase();
@@ -144,7 +199,10 @@ public class MainActivity extends AppCompatActivity implements NoticiesListAdapt
         return true;
     }
 
-
+    /**
+     * Clase que hereta d'AsyncTasc. Reb un String com a paràmetre i tornarà un ArrayList un cop
+     * s'ha dut a terme l
+     */
     private class DownloadNoticiesTask extends AsyncTask<String, Void, ArrayList<Noticia>> {
 
         @Override

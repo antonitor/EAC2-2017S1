@@ -67,7 +67,7 @@ public class NoticiesListAdapter extends RecyclerView.Adapter<NoticiesListAdapte
         return mNoticiesList.size();
     }
 
-    class NoticiaHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    class NoticiaHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener{
 
         ImageView thumbnailImageView;
         TextView titolNoticiaTextView;
@@ -77,6 +77,7 @@ public class NoticiesListAdapter extends RecyclerView.Adapter<NoticiesListAdapte
             thumbnailImageView = (ImageView) itemView.findViewById(R.id.thumbnail_image_view);
             titolNoticiaTextView = (TextView) itemView.findViewById(R.id.titol_noticia_text_view);
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
 
         @Override
@@ -84,6 +85,14 @@ public class NoticiesListAdapter extends RecyclerView.Adapter<NoticiesListAdapte
             int adapterPosition = getAdapterPosition();
             Noticia noticia = mNoticiesList.get(adapterPosition);
             mClickHandler.onClick(noticia);
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            int adapterPosition = getAdapterPosition();
+            mNoticiesList.remove(adapterPosition);
+            notifyItemRemoved(adapterPosition);
+            return true;
         }
     }
 }
