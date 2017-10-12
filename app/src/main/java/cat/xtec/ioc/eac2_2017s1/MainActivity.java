@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView mErrorMessageDisplay;
     private ArrayList<Noticia> mLlistaNoticies;
     private Context mContext;
+    private boolean isAppStarting = true;
     public final static String LOG_TAG = "TESTING -------->>>>>  ";
 
     @Override
@@ -72,12 +73,16 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadNoticies() {
         showNoticiesView();
-
         if (comprovaXarxa(this)) {
+            isAppStarting = false;
             new DownloadNoticiesTask().execute(MARCA_URL);
-        } else {
+        } else if (isAppStarting) {
+            isAppStarting = false;
+            Toast.makeText(this,"Carrega offline de noticies.", Toast.LENGTH_LONG).show();
             mLlistaNoticies = loadLlistaNoticiesFromDB();
             mAdapter.setNoticiesList(mLlistaNoticies);
+        } else {
+            Toast.makeText(this,"No hi ha connexió!!", Toast.LENGTH_LONG).show();
         }
     }
 

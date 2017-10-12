@@ -86,7 +86,6 @@ public class NetworkUtils {
         if (networkInfo != null && networkInfo.isConnected()) {
             return true;
         } else {
-            Toast.makeText(context,"No hi ha connexió!!", Toast.LENGTH_LONG).show();
             return false;
         }
     }

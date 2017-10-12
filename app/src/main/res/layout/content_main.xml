@@ -14,7 +14,9 @@
         android:layout_width="42dp"
         android:layout_height="42dp"
         android:layout_gravity="center"
-        android:visibility="invisible" />
+        android:visibility="invisible"
+        android:indeterminate="true"
+        style="?android:attr/progressBarStyleLarge"/>
 
     <TextView
         android:id="@+id/tv_error_message_display"
