@@ -11,7 +11,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static cat.xtec.ioc.eac2_2017s1.MainActivity.LOG_TAG;
+import cat.xtec.ioc.eac2_2017s1.data.Noticia;
 
 /**
  * Created by Admin on 05/10/2017.
@@ -23,26 +23,6 @@ public class MarcaXmlParser {
     private static final String ns = null;
 
     //Aquesta classe representa una entrada de noticia del RSS Feed
-    public static class Noticia {
-        public final String titol;          //Títol de la noticia
-        public final String enllac;         //Enllaç a la noticia completa
-        public final String autor;          //Autor de la notícia
-        public final String descripcio;     //Descripció de la noticia
-        public final String data;           //Data de publicació de la noticia
-        public final String categoria;      //Categoria de la noticia
-        public String thumbnail;      //Enllaç al thumbnail de la imatge
-
-
-        public Noticia(String title, String author, String link, String desc, String date, String cat, String thumb) {
-            this.titol = title;
-            this.autor = author;
-            this.enllac = link;
-            this.descripcio = desc;
-            this.data = date;
-            this.categoria = cat;
-            this.thumbnail = thumb;
-        }
-    }
 
     public List<Noticia> analitza(InputStream in) throws XmlPullParserException, IOException {
         try {
@@ -264,16 +244,11 @@ public class MarcaXmlParser {
 
     //Llegeix l'enllaç al thumbnail de l'imatge de una notícia del feed i el retorna com String
     private String llegirThumbnail(XmlPullParser parser) throws IOException, XmlPullParserException {
-
         String thumbnail = "";
-
         //L'etiqueta actual ha de ser "thumbnail"
         parser.require(XmlPullParser.START_TAG, ns, "media:thumbnail");
-
         thumbnail = parser.getAttributeValue(null, "url");
-
         parser.nextTag();
-
         return thumbnail;
     }
 
@@ -282,13 +257,10 @@ public class MarcaXmlParser {
     //Extrau el valor de text per les etiquetes
     private String llegeixText(XmlPullParser parser) throws IOException, XmlPullParserException {
         String resultat = "";
-
         if (parser.next() == XmlPullParser.TEXT) {
             resultat = parser.getText();
             parser.nextTag();
         }
         return resultat;
     }
-
-
 }

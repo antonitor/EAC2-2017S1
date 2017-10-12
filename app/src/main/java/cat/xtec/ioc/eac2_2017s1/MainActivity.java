@@ -29,7 +29,7 @@ import cat.xtec.ioc.eac2_2017s1.data.Contracte.Noticies;
 import cat.xtec.ioc.eac2_2017s1.utils.MarcaXmlParser;
 import cat.xtec.ioc.eac2_2017s1.utils.NetworkUtils;
 import cat.xtec.ioc.eac2_2017s1.utils.NoticiesListAdapter;
-import cat.xtec.ioc.eac2_2017s1.utils.MarcaXmlParser.Noticia;
+import cat.xtec.ioc.eac2_2017s1.data.Noticia;
 
 import static cat.xtec.ioc.eac2_2017s1.utils.NetworkUtils.comprovaXarxa;
 
@@ -39,8 +39,8 @@ public class MainActivity extends AppCompatActivity {
 
     private String mCacheDir;
     private NoticiesListAdapter mAdapter;
-    AjudaBD mAjudaBD;
-    SQLiteDatabase mDB;
+    private AjudaBD mAjudaBD;
+    private SQLiteDatabase mDB;
     private RecyclerView mNoticiesRecyclerView;
     private ProgressBar mLoadingIndicator;
     private TextView mErrorMessageDisplay;
@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         showNoticiesView();
 
         if (comprovaXarxa(this)) {
-            new FetchNoticiesTask().execute(MARCA_URL);
+            new DownloadNoticiesTask().execute(MARCA_URL);
         } else {
             mLlistaNoticies = loadLlistaNoticiesFromDB();
             mAdapter.setNoticiesList(mLlistaNoticies);
@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public class FetchNoticiesTask extends AsyncTask<String, Void, ArrayList<Noticia>> {
+    private class DownloadNoticiesTask extends AsyncTask<String, Void, ArrayList<Noticia>> {
 
         @Override
         protected void onPreExecute() {
@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
 
             try {
                 mLlistaNoticies= (ArrayList<Noticia>) new MarcaXmlParser().analitza(inputStream);
-                descarregaImatgesCache();
+                downloadImagesToCache();
                 storeNoticesOnDB(mLlistaNoticies);
                 Log.d(LOG_TAG, "Exit doInBackgroud. Noticies list size: " + mLlistaNoticies.size());
                 return mLlistaNoticies;
@@ -184,17 +184,17 @@ public class MainActivity extends AppCompatActivity {
         return llista;
     }
 
-    public void storeNoticesOnDB( ArrayList<Noticia> noticies){
+    private void storeNoticesOnDB( ArrayList<Noticia> noticies){
         cleanNoticiesTable();
         for (Noticia noticia : noticies) {
             ContentValues cv = new ContentValues();
-            cv.put(Noticies.TITOL, noticia.titol);
-            cv.put(Noticies.AUTOR, noticia.autor);
-            cv.put(Noticies.DESCRIPCIO, noticia.descripcio);
-            cv.put(Noticies.DATA_PUBLICACIO, noticia.data);
-            cv.put(Noticies.CATEGORIA, noticia.categoria);
-            cv.put(Noticies.ENLLAC, noticia.enllac);
-            cv.put(Noticies.THUMBNAIL, noticia.thumbnail);
+            cv.put(Noticies.TITOL, noticia.getTitol());
+            cv.put(Noticies.AUTOR, noticia.getAutor());
+            cv.put(Noticies.DESCRIPCIO, noticia.getDescripcio());
+            cv.put(Noticies.DATA_PUBLICACIO, noticia.getData());
+            cv.put(Noticies.CATEGORIA, noticia.getCategoria());
+            cv.put(Noticies.ENLLAC, noticia.getEnllac());
+            cv.put(Noticies.THUMBNAIL, noticia.getThumbnail());
 
             mDB = mAjudaBD.getWritableDatabase();
             mDB.insert(Noticies.NOM_TAULA, null, cv);
@@ -218,11 +218,13 @@ public class MainActivity extends AppCompatActivity {
         mNoticiesRecyclerView.setVisibility(View.VISIBLE);
     }
 
-    private void descarregaImatgesCache() {
+    private void downloadImagesToCache() {
+        int count = 1;
         for (Noticia noticia : mLlistaNoticies) {
-            String path_imatge = mCacheDir + UUID.randomUUID().toString().replace("-","");
-            NetworkUtils.downloadImageToCache(noticia.thumbnail, path_imatge);
-            noticia.thumbnail=path_imatge;
+            String path_imatge = mCacheDir + "imatge"+count;  //UUID.randomUUID().toString().replace("-","");
+            NetworkUtils.downloadImageToCache(noticia.getThumbnail(), path_imatge);
+            noticia.setThumbnail(path_imatge);
+            count++;
         }
     }
 

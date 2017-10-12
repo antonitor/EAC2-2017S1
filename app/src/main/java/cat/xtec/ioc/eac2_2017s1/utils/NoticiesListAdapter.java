@@ -1,9 +1,7 @@
 package cat.xtec.ioc.eac2_2017s1.utils;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,13 +9,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.FileNotFoundException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import cat.xtec.ioc.eac2_2017s1.R;
-import cat.xtec.ioc.eac2_2017s1.data.Contracte.Noticies;
-import cat.xtec.ioc.eac2_2017s1.utils.MarcaXmlParser.Noticia;
+import cat.xtec.ioc.eac2_2017s1.data.Noticia;
 /**
  * Created by Toni on 08/10/2017.
  */
@@ -40,8 +35,8 @@ public class NoticiesListAdapter extends RecyclerView.Adapter<NoticiesListAdapte
     @Override
     public void onBindViewHolder(NoticiaHolder holder, int position) {
 
-        String thumnail = ((Noticia )mNoticiesList.get(position)).thumbnail;
-        String titol = ((Noticia )mNoticiesList.get(position)).titol;
+        String thumnail = mNoticiesList.get(position).getThumbnail();
+        String titol = mNoticiesList.get(position).getTitol();
 
         if (Drawable.createFromPath(thumnail)!=null){
             holder.thumbnailImageView.setImageDrawable(Drawable.createFromPath(thumnail));
