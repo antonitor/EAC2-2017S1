@@ -17,6 +17,10 @@ public class AjudaBD extends SQLiteOpenHelper{
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
+    /**
+     * Crea una nova taula Noticies
+     * @param sqLiteDatabase
+     */
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         final String SQL_CREAR_TAULA_NOTICIES = "CREATE TABLE " + Noticies.NOM_TAULA + " (" +
@@ -33,6 +37,12 @@ public class AjudaBD extends SQLiteOpenHelper{
         sqLiteDatabase.execSQL(SQL_CREAR_TAULA_NOTICIES);
     }
 
+    /**
+     * Esborra la taula Noticies i la torna a crear quan s'ha incrementat el nombre de versió
+     * @param sqLiteDatabase
+     * @param i
+     * @param i1
+     */
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + Noticies.NOM_TAULA);

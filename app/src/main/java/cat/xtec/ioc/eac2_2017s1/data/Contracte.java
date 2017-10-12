@@ -8,6 +8,10 @@ import android.provider.BaseColumns;
 
 public class Contracte {
 
+    /**
+     * La interficie base columns afegeix el camp _id integer autoincrement per tal de
+     * facilitar l'us d'adaptadors
+     */
     public static final class Noticies implements BaseColumns {
         public static final String NOM_TAULA = "noticies";
         public static final String TITOL = "titol";

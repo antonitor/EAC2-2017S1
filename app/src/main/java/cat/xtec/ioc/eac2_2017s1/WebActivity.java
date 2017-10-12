@@ -40,7 +40,8 @@ public class WebActivity extends AppCompatActivity {
         String data = mIntent.getStringExtra("data");
 
         StringBuilder sBuilder = new StringBuilder();
-        sBuilder.append("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">");
+        sBuilder.append("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><meta "
+                + "http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">");
         sBuilder.append("<body>");
         sBuilder.append("<h3>"+ mTitle +"</h3>");
         sBuilder.append("<hr />");
