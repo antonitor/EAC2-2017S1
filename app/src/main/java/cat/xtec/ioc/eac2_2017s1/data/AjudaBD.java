@@ -39,9 +39,6 @@ public class AjudaBD extends SQLiteOpenHelper{
 
     /**
      * Esborra la taula Noticies i la torna a crear quan s'ha incrementat el nombre de versió
-     * @param sqLiteDatabase
-     * @param i
-     * @param i1
      */
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {

@@ -14,16 +14,19 @@ import java.util.List;
 import cat.xtec.ioc.eac2_2017s1.data.Noticia;
 
 /**
- * Created by Admin on 05/10/2017.
+ * Created by Toni on 10/10/2017.
+ *
+ * Aquesta classe conté els mètodes necessaris per tal de recollir les dades del RSS del diari MARCA
+ * allotjat a http://estaticos.marca.com/rss/portada.xml
  */
-
 public class MarcaXmlParser {
 
     // No fem servir namespaces
     private static final String ns = null;
 
-    //Aquesta classe representa una entrada de noticia del RSS Feed
-
+    /**
+     * Torna una llista amb les Noticies del RSS a partir d'un InputStream
+     */
     public List<Noticia> analitza(InputStream in) throws XmlPullParserException, IOException {
         try {
             //Obtenim analitzador
@@ -75,8 +78,10 @@ public class MarcaXmlParser {
         return llistaEntrades;
     }
 
-    //Analitza el contingut d'una entrada. Si troba un ttol, resum o enllaç, crida els mètodes de lectura
-    //propis per processar-los. Si no, ignora l'etiqueta.
+    /**
+     * Analitza el contingut d'una entrada. Si troba un titol, enllaç, descripció, autor, data
+     * categoria o thumbnail crida els mètodes de lectura propis per processar-los. Si no, ignora l'etiqueta.
+     */
     private Noticia llegirEntrada(XmlPullParser parser) throws XmlPullParserException, IOException {
         String titol = null;
         String enllac = null;
@@ -89,7 +94,7 @@ public class MarcaXmlParser {
         //L'etiqueta actual ha de ser "item"
         parser.require(XmlPullParser.START_TAG, ns, "item");
 
-        //Mentre que no acabe l'etiqueta de "entry"
+        //Mentre que no acabe l'etiqueta de "item"
         while (parser.next() != XmlPullParser.END_TAG) {
             //Ignora fins que no trobem un començament d'etiqueta
             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -109,12 +114,14 @@ public class MarcaXmlParser {
                     autor = llegirAutor(parser);
                     break;
                 case "media:description":
+                    //S'esborren totes les etiquetes html dins la descipció obtinguda
                     descripcio = llegirDescripcio(parser).replaceAll("\\<[^>]*>","");
                     break;
                 case "pubDate":
                     data = llegirData(parser);
                     break;
                 case "category":
+                    //S'afegeixen categories separades per una coma
                     if (categoria.length()>0) {
                         categoria = llegirCategoria(parser) + ", " + categoria;
                     } else {
@@ -134,7 +141,9 @@ public class MarcaXmlParser {
         return new Noticia(titol, autor, enllac, descripcio, data, categoria, thumbnail);
     }
 
-    //Aquesta funció serveix per saltar-se una etiqueta i les seves subetiquetes aniuades.
+    /**
+     * Aquest mètode serveix per saltar-se una etiqueta i les seves subetiquetes aniuades.
+     */
     private void saltar(XmlPullParser parser) throws XmlPullParserException, IOException {
         //Si no és un començament d'etiqueta: ERROR
         if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -143,7 +152,6 @@ public class MarcaXmlParser {
         int depth = 1;
 
         //Comprova que ha passat per tantes etiquetes de començament com acabament d'etiqueta
-
         while (depth != 0) {
             switch (parser.next()) {
                 case XmlPullParser.END_TAG:
@@ -158,7 +166,9 @@ public class MarcaXmlParser {
         }
     }
 
-    //Llegeix el títol de una notcia del feed i el retorna com String
+    /**
+     *  Llegeix el títol de una noticia del feed i el retorna com String
+     */
     private String llegirTitol(XmlPullParser parser) throws IOException, XmlPullParserException {
         //L'etiqueta actual ha de ser "title"
         parser.require(XmlPullParser.START_TAG, ns, "title");
@@ -175,7 +185,13 @@ public class MarcaXmlParser {
         }
     }
 
-    //Llegeix l'enllaç de una notícia del feed i el retorna com String
+    /**
+     * Llegeix l'enllaç de una notícia del feed i el retorna com String
+     * @param parser
+     * @return
+     * @throws IOException
+     * @throws XmlPullParserException
+     */
     private String llegirEnllac(XmlPullParser parser) throws IOException, XmlPullParserException {
         String enllac = "";
 
@@ -195,9 +211,15 @@ public class MarcaXmlParser {
         }
     }
 
-    //Llegeix l'autor de una notícia del feed i el retorna com String
+    /**
+     * Llegeix l'autor de una notícia  i el retorna com String
+     * @param parser
+     * @return
+     * @throws IOException
+     * @throws XmlPullParserException
+     */
     private String llegirAutor(XmlPullParser parser) throws IOException, XmlPullParserException {
-        //L'etiqueta actual ha de ser "summary"
+        //L'etiqueta actual ha de ser "dc:creator"
         parser.require(XmlPullParser.START_TAG, ns, "dc:creator");
 
         String autor = llegeixText(parser);
@@ -210,9 +232,15 @@ public class MarcaXmlParser {
         }
     }
 
-    //Llegeix la descripció de una notícia del feed i el retorna com String
+    /**
+     * Llegeix la descripció de una notícia del feed i el retorna com String
+     * @param parser
+     * @return
+     * @throws IOException
+     * @throws XmlPullParserException
+     */
     private String llegirDescripcio(XmlPullParser parser) throws IOException, XmlPullParserException {
-        //L'etiqueta actual ha de ser "summary"
+        //L'etiqueta actual ha de ser "media:description"
         String descripcio = "";
         parser.require(XmlPullParser.START_TAG, ns, "media:description");
 
@@ -223,9 +251,15 @@ public class MarcaXmlParser {
         return descripcio;
     }
 
-    //Llegeix la data de publicació de una notícia del feed i el retorna com String
+    /**
+     * Llegeix la data de publicació de una notícia del feed i el retorna com String
+     * @param parser
+     * @return
+     * @throws IOException
+     * @throws XmlPullParserException
+     */
     private String llegirData(XmlPullParser parser) throws IOException, XmlPullParserException {
-        //L'etiqueta actual ha de ser "summary"
+        //L'etiqueta actual ha de ser "pubDate"
         String pubdate = "";
 
         parser.require(XmlPullParser.START_TAG, ns, "pubDate");
@@ -237,9 +271,15 @@ public class MarcaXmlParser {
         return pubdate;
     }
 
-    //Llegeix la categoría de una notícia del feed i el retorna com String
+    /**
+     * Llegeix la categoría de una notícia del feed i el retorna com String
+     * @param parser
+     * @return
+     * @throws IOException
+     * @throws XmlPullParserException
+     */
     private String llegirCategoria(XmlPullParser parser) throws IOException, XmlPullParserException {
-        //L'etiqueta actual ha de ser "summary"
+        //L'etiqueta actual ha de ser "category"
         String category = "";
         parser.require(XmlPullParser.START_TAG, ns, "category");
 
@@ -249,7 +289,13 @@ public class MarcaXmlParser {
         return category;
     }
 
-    //Llegeix l'enllaç al thumbnail de l'imatge de una notícia del feed i el retorna com String
+    /**
+     * Llegeix l'enllaç al thumbnail de l'imatge de una notícia del feed i el retorna com String
+     * @param parser
+     * @return
+     * @throws IOException
+     * @throws XmlPullParserException
+     */
     private String llegirThumbnail(XmlPullParser parser) throws IOException, XmlPullParserException {
         String thumbnail = "";
         //L'etiqueta actual ha de ser "thumbnail"
@@ -260,8 +306,13 @@ public class MarcaXmlParser {
     }
 
 
-
-    //Extrau el valor de text per les etiquetes
+    /**
+     * Extrau el valor de text per les etiquetes
+     * @param parser
+     * @return
+     * @throws IOException
+     * @throws XmlPullParserException
+     */
     private String llegeixText(XmlPullParser parser) throws IOException, XmlPullParserException {
         String resultat = "";
         if (parser.next() == XmlPullParser.TEXT) {
