@@ -1,5 +1,15 @@
 <resources>
-    <string name="app_name">EAC2-2017S1</string>
+    <string name="app_name">Lector RSS</string>
     <string name="action_search">Buscar</string>
     <string name="action_refresh">Actualitzar</string>
+    <string name="offline_load">Carrega offline de noticies</string>
+    <string name="offline">No hi ha connexió!!</string>
+    <string name="error_connex">Error de connexió</string>
+
+    <string name="titol_extra" translatable="false">xtitol</string>
+    <string name="descripcio_extra" translatable="false">xdescripcio</string>
+    <string name="categoria_extra" translatable="false">xcategoria</string>
+    <string name="autor_extra" translatable="false">xautor</string>
+    <string name="data_extra" translatable="false">xdata</string>
+    <string name="enllac_extra" translatable="false">xenllac</string>
 </resources>

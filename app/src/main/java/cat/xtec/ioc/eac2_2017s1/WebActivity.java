@@ -21,8 +21,8 @@ public class WebActivity extends AppCompatActivity {
         WebView webview = (WebView) this.findViewById(R.id.web_view);
 
         mIntent = getIntent();
-        mTitle = mIntent.getStringExtra("titol");
-        mLink = mIntent.getStringExtra("enllac");
+        mTitle = mIntent.getStringExtra(getString(R.string.titol_extra));
+        mLink = mIntent.getStringExtra(getString(R.string.enllac_extra));
         this.setTitle(mTitle);
 
         if (NetworkUtils.comprovaXarxa(this)) {
@@ -34,10 +34,10 @@ public class WebActivity extends AppCompatActivity {
     }
 
     public String buildHtmlNoticia() {
-        String descripcio = mIntent.getStringExtra("descripcio");
-        String autor = mIntent.getStringExtra("autor");
-        String categoria = mIntent.getStringExtra("categoria");
-        String data = mIntent.getStringExtra("data");
+        String descripcio = mIntent.getStringExtra(getString(R.string.descripcio_extra));
+        String autor = mIntent.getStringExtra(getString(R.string.autor_extra));
+        String categoria = mIntent.getStringExtra(getString(R.string.categoria_extra));
+        String data = mIntent.getStringExtra(getString(R.string.data_extra));
 
         StringBuilder sBuilder = new StringBuilder();
         sBuilder.append("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><meta "

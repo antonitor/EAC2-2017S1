@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements NoticiesListAdapt
         mErrorMessageDisplay = (TextView) findViewById(R.id.tv_error_message_display);
         mContext = this;
         //Ruta al directori caché d'aquesta aplicació
-        mCacheDir  = this.getApplicationContext().getCacheDir().toString();
+        mCacheDir  = this.getCacheDir().toString();
 
         //Instància de la nostra classe que hereta de SQLiteOpenHelper
         mAjudaBD = new AjudaBD(this);
@@ -102,11 +102,11 @@ public class MainActivity extends AppCompatActivity implements NoticiesListAdapt
             new DownloadNoticiesTask().execute(MARCA_URL);
         } else if (isAppStarting) {
             isAppStarting = false;
-            Toast.makeText(this,"Carrega offline de noticies.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this,getString(R.string.offline_load), Toast.LENGTH_LONG).show();
             mLlistaNoticies = loadLlistaNoticiesFromDB();
             mAdapter.setNoticiesList(mLlistaNoticies);
         } else {
-            Toast.makeText(this,"No hi ha connexió!!", Toast.LENGTH_LONG).show();
+            Toast.makeText(this,getString(R.string.offline), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -154,12 +154,12 @@ public class MainActivity extends AppCompatActivity implements NoticiesListAdapt
     @Override
     public void onClick(Noticia noticia) {
         Intent intent = new Intent(this, WebActivity.class);
-        intent.putExtra("titol", noticia.getTitol());
-        intent.putExtra("descripcio", noticia.getDescripcio());
-        intent.putExtra("categoria", noticia.getCategoria());
-        intent.putExtra("autor", noticia.getAutor());
-        intent.putExtra("data", noticia.getData());
-        intent.putExtra("enllac", noticia.getEnllac());
+        intent.putExtra(getString(R.string.titol_extra), noticia.getTitol());
+        intent.putExtra(getString(R.string.descripcio_extra), noticia.getDescripcio());
+        intent.putExtra(getString(R.string.categoria_extra), noticia.getCategoria());
+        intent.putExtra(getString(R.string.autor_extra), noticia.getAutor());
+        intent.putExtra(getString(R.string.data_extra), noticia.getData());
+        intent.putExtra(getString(R.string.enllac_extra), noticia.getEnllac());
         startActivity(intent);
     }
 
@@ -234,7 +234,7 @@ public class MainActivity extends AppCompatActivity implements NoticiesListAdapt
             try {
                 inputStream = NetworkUtils.getResponseFromHttpUrl(url);
             } catch (IOException ioe){
-                Toast.makeText(mContext, "Error de connexió", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, getString(R.string.error_connex), Toast.LENGTH_SHORT).show();
                 return null;
             }
 
