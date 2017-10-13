@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements NoticiesListAdapt
         mErrorMessageDisplay = (TextView) findViewById(R.id.tv_error_message_display);
         mContext = this;
         //Ruta al directori caché d'aquesta aplicació
-        mCacheDir  = this.getCacheDir().toString();
+        mCacheDir  = this.getApplicationContext().getCacheDir().toString();
 
         //Instància de la nostra classe que hereta de SQLiteOpenHelper
         mAjudaBD = new AjudaBD(this);
