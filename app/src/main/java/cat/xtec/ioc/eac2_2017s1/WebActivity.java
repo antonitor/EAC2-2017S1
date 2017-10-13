@@ -18,13 +18,18 @@ public class WebActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web);
 
+        //Recollim el widged WebView en una variable membre
         WebView webview = (WebView) this.findViewById(R.id.web_view);
 
+        //Recollim el Intent que ha llençat aquesta Activity i en recollim els Extras xtitol i xenllac
         mIntent = getIntent();
         mTitle = mIntent.getStringExtra(getString(R.string.titol_extra));
         mLink = mIntent.getStringExtra(getString(R.string.enllac_extra));
+        //Afegim el títol a l'Activity
         this.setTitle(mTitle);
 
+        //Si tenim xarxa carreguem la pàgina web del enllaç, si no construim un String amb format
+        //html amb els camps emmagatzemats que componen la noticia
         if (NetworkUtils.comprovaXarxa(this)) {
             webview.loadUrl(mLink);
         } else {
@@ -33,6 +38,12 @@ public class WebActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * A partir dels atributs del objexte Noticia pasats com Extras a aquest Activity construïm
+     * un String amb formàt html per tal de mostrar el titol, descripció, autor, categories i data
+     * de la noticia
+     * @return String en forma de html
+     */
     public String buildHtmlNoticia() {
         String descripcio = mIntent.getStringExtra(getString(R.string.descripcio_extra));
         String autor = mIntent.getStringExtra(getString(R.string.autor_extra));
