@@ -20,10 +20,20 @@ import static cat.xtec.ioc.eac2_2017s1.MainActivity.LOG_TAG;
 
 /**
  * Created by Toni on 08/10/2017.
+ *
+ * Aquesta classe conté les eines necessaries per realitzar tasques onLine
  */
-
 public class NetworkUtils {
 
+    /**
+     * No s'ha d'instanciar aquesta classe ja que tots els seus mètodes son Static
+     */
+    private NetworkUtils(){}
+
+    /**
+     * Retorna un InputStream enllaçat a la URL que li pasem per paràmetre
+     * @param url d'on volem obtindre l'InputStream
+     */
     public static InputStream getResponseFromHttpUrl(URL url) throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         int resposta = -1;
@@ -41,6 +51,11 @@ public class NetworkUtils {
         }
     }
 
+    /**
+     * Descarrega la imatge des de una URL a internet cap a la ruta que li pasem per paràmetre
+     * @param urlString URL d'on s'ha d'obtindre la imatge
+     * @param path_imatge ruta on s'ha d'emmagatzemar la imatge
+     */
     public static void downloadImageToCache(String urlString, String path_imatge){
         URL urlImatge = buildURl(urlString);
         InputStream inputStream = null;
@@ -69,9 +84,12 @@ public class NetworkUtils {
         }
     }
 
-
+    /**
+     * Simple mètode que construeix un objecte de tipus URL a partir d'un String
+     * @param url String que conté la url
+     * @return URL a rel de la String pasada per paràmetre
+     */
     public static URL buildURl(String url) {
-
         try {
             return new URL(url);
         } catch (MalformedURLException e) {
@@ -80,6 +98,12 @@ public class NetworkUtils {
         }
     }
 
+    /**
+     * Mitjançant el mètode getSystemService comprova si hi ha conexió a internet disponible
+     *
+     * @param context context de l'activity que truca aquest mètode
+     * @return true si tenim connexió, false si no en tenim
+     */
     public static boolean comprovaXarxa(Context context) {
         ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
@@ -90,6 +114,9 @@ public class NetworkUtils {
         }
     }
 
+    /**
+     * Tanca l'InputStream que li pasem per paràmetre
+     */
     public static void closeInputStream (InputStream in) {
         try {
             in.close();
