@@ -12,4 +12,5 @@
     <string name="autor_extra" translatable="false">xautor</string>
     <string name="data_extra" translatable="false">xdata</string>
     <string name="enllac_extra" translatable="false">xenllac</string>
+    <string name="load_error">Error al carregar les noticies</string>
 </resources>
