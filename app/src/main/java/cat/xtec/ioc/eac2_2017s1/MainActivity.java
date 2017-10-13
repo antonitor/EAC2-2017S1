@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import cat.xtec.ioc.eac2_2017s1.data.AjudaBD;
 import cat.xtec.ioc.eac2_2017s1.data.Contracte.Noticies;
@@ -360,12 +361,11 @@ public class MainActivity extends AppCompatActivity implements NoticiesListAdapt
      * el Thumbnail.
      */
     private void downloadImagesToCache() {
-        int count = 1;
         for (Noticia noticia : mLlistaNoticies) {
-            String path_imatge = mCacheDir + "imatge"+count;  //UUID.randomUUID().toString().replace("-","");
+            String path_imatge = mCacheDir + "/" + UUID.randomUUID().toString().replace("-","");
+            Log.d(LOG_TAG, "IMAGE CATCHED AS: " + path_imatge);
             NetworkUtils.downloadImageToCache(noticia.getThumbnail(), path_imatge);
             noticia.setThumbnail(path_imatge);
-            count++;
         }
     }
 
