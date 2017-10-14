@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements NoticiesListAdapt
     private TextView mErrorMessageDisplay;
     private static ArrayList<Noticia> mLlistaNoticies;
     private Context mContext;
-    private boolean isFirstAppExecution = true;
+    private static boolean isFirstAppExecution = true;
     public final static String LOG_TAG = "TESTING -------->>>>>  ";
 
     @Override
@@ -84,6 +84,14 @@ public class MainActivity extends AppCompatActivity implements NoticiesListAdapt
         mAdapter = new NoticiesListAdapter(this, this);
         mNoticiesRecyclerView.setAdapter(mAdapter);
 
+        /*
+        Aquest mètode onCreate es llença cada cop que s'obre aquesta Activity, es a dir,
+        cada cop que canviem l'orientació del dispositiu o quan premem el botó home i tornem
+        a obrir l'app.
+
+        Per tant, si la llista de noticies és null, cal carregar de nou les noticies, pro si no ho és,
+        tan sols cal omplir el RecyclerView amb el contingut de la llista.
+         */
         if (mLlistaNoticies == null) {
             loadNoticies();
         } else {
@@ -95,11 +103,14 @@ public class MainActivity extends AppCompatActivity implements NoticiesListAdapt
     }
 
     /**
-     * Aquest mètode comprova si tenim conexió, sí és així llença la tasca que descarrega el xml
+     * Aquest mètode comprova si tenim conexió, sí és així, llença la tasca que descarrega el xml
      * d'internet, el pasa pel XMLPullParser i en retorna un ArrayList amb les Noticies.
      *
-     * Si no hi ha internet i és el primer cop que engeguem l'aplicació, prova de carregar les
-     * noticies de la base de dades SQLite, pro si l'aplicació ja ha carregat noticies abans
+     * Si no hi ha conexió i és el primer cop que engeguem l'aplicació, prova de carregar les
+     * noticies de la base de dades SQLite, i si n'obté un llistat, el carrega al RecyclerView.
+     * Si no s'obté cap llista de la base de dades, mostra el missatge d'error.
+     *
+     * Si no és el primer cop que s'engega, i l'aplicació ja ha carregat noticies abans,
      * tan sols mostra un missatge advertint que no hi ha connexió i no fa res mes. Tal i com
      * demana l'enunciat del EAC.
      */

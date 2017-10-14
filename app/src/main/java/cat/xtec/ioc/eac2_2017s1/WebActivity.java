@@ -1,8 +1,10 @@
 package cat.xtec.ioc.eac2_2017s1;
 
+import android.support.v7.app.ActionBar;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.webkit.WebView;
 
 import cat.xtec.ioc.eac2_2017s1.utils.NetworkUtils;
@@ -17,6 +19,12 @@ public class WebActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web);
+
+        //Funcionalitat afegida que no es demana al enunciat del EAC2
+        //Mostra el botó per tornar a MainActivity
+        ActionBar ab =  getSupportActionBar();
+        ab.setHomeButtonEnabled(true);
+        ab.setDisplayHomeAsUpEnabled(true);
 
         //Recollim el widged WebView en una variable membre
         WebView webview = (WebView) this.findViewById(R.id.web_view);
@@ -66,5 +74,20 @@ public class WebActivity extends AppCompatActivity {
         return sBuilder.toString();
     }
 
-
+    /**
+     * Funcionalitat afegida que no es demana al enunciat del EAC2
+     *
+     * En premer el botó enrere que es mostra al costat del titol al ActionBar es torna
+     * a MainActivity i es tanca aquesta.
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                Intent homeIntent = new Intent(this, MainActivity.class);
+                homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(homeIntent);
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }
