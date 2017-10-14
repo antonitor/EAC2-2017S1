@@ -52,9 +52,9 @@ public class MainActivity extends AppCompatActivity implements NoticiesListAdapt
     private RecyclerView mNoticiesRecyclerView;
     private ProgressBar mLoadingIndicator;
     private TextView mErrorMessageDisplay;
-    private ArrayList<Noticia> mLlistaNoticies;
+    private static ArrayList<Noticia> mLlistaNoticies;
     private Context mContext;
-    private boolean isAppStarting = true;
+    private boolean isFirstAppExecution = true;
     public final static String LOG_TAG = "TESTING -------->>>>>  ";
 
     @Override
@@ -84,7 +84,14 @@ public class MainActivity extends AppCompatActivity implements NoticiesListAdapt
         mAdapter = new NoticiesListAdapter(this, this);
         mNoticiesRecyclerView.setAdapter(mAdapter);
 
-        loadNoticies();
+        if (mLlistaNoticies == null) {
+            loadNoticies();
+        } else {
+            if (mLlistaNoticies.size()>0)
+                mAdapter.setNoticiesList(mLlistaNoticies);
+            else
+                loadNoticies();
+        }
     }
 
     /**
@@ -99,15 +106,25 @@ public class MainActivity extends AppCompatActivity implements NoticiesListAdapt
     private void loadNoticies() {
         showNoticiesView();
         if (comprovaXarxa(this)) {
-            isAppStarting = false;
+            isFirstAppExecution = false;
             new DownloadNoticiesTask().execute(MARCA_URL);
-        } else if (isAppStarting) {
-            isAppStarting = false;
-            Toast.makeText(this,getString(R.string.offline_load), Toast.LENGTH_LONG).show();
-            mLlistaNoticies = loadLlistaNoticiesFromDB();
-            mAdapter.setNoticiesList(mLlistaNoticies);
         } else {
-            Toast.makeText(this,getString(R.string.offline), Toast.LENGTH_LONG).show();
+            if (isFirstAppExecution) {
+                isFirstAppExecution = false;
+                mLlistaNoticies = loadLlistaNoticiesFromDB();
+                if (mLlistaNoticies.size() > 0) {
+                    Toast.makeText(this, getString(R.string.offline_load), Toast.LENGTH_LONG).show();
+                    mAdapter.setNoticiesList(mLlistaNoticies);
+                } else {
+                    Toast.makeText(this, getString(R.string.offline), Toast.LENGTH_LONG).show();
+                    showErrorMessage();
+                }
+            } else {
+                if (!(mLlistaNoticies.size()>0)) {
+                    showErrorMessage();
+                }
+                Toast.makeText(this, getString(R.string.offline), Toast.LENGTH_LONG).show();
+            }
         }
     }
 
