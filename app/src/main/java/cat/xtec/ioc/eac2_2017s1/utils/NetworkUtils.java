@@ -3,8 +3,6 @@ package cat.xtec.ioc.eac2_2017s1.utils;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.util.Log;
-import android.widget.Toast;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -13,10 +11,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import cat.xtec.ioc.eac2_2017s1.MainActivity;
-
-import static cat.xtec.ioc.eac2_2017s1.MainActivity.LOG_TAG;
 
 /**
  * Created by Toni on 08/10/2017.
@@ -39,14 +33,12 @@ public class NetworkUtils {
         int resposta = -1;
         try {
             resposta = urlConnection.getResponseCode();
-            Log.d(LOG_TAG, "HTTP Response Code: " + resposta);
             if (resposta == HttpURLConnection.HTTP_OK) {
                 return urlConnection.getInputStream();
             } else {
                 return null;
             }
         } catch (IOException ioe) {
-            Log.d(LOG_TAG, "Impossible obtenir inputStream.");
             return null;
         }
     }
@@ -80,7 +72,6 @@ public class NetworkUtils {
             inputstream.close();
             outputstream.close();
         } catch (IOException exception) {
-            Log.d(LOG_TAG, "Alguna cosa no ha anat bé!");
         }
     }
 
@@ -93,7 +84,6 @@ public class NetworkUtils {
         try {
             return new URL(url);
         } catch (MalformedURLException e) {
-            Log.d(LOG_TAG, "Impossible construïr la URL");
             return null;
         }
     }

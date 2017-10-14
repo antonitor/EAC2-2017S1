@@ -5,6 +5,7 @@
     <string name="offline_load">Carrega offline de noticies</string>
     <string name="offline">No hi ha connexió!!</string>
     <string name="error_connex">Error de connexió</string>
+    <string name="load_error">Error al carregar les noticies</string>
 
     <string name="titol_extra" translatable="false">xtitol</string>
     <string name="descripcio_extra" translatable="false">xdescripcio</string>
@@ -12,5 +13,6 @@
     <string name="autor_extra" translatable="false">xautor</string>
     <string name="data_extra" translatable="false">xdata</string>
     <string name="enllac_extra" translatable="false">xenllac</string>
-    <string name="load_error">Error al carregar les noticies</string>
+    <string name="llista_save_instance_state" translatable="false">saveLlistaNoticies</string>
+    <string name="first_app_run_save_instance_state" translatable="false">safeFirstAppExecution</string>
 </resources>

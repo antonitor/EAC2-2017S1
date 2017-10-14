@@ -52,14 +52,26 @@ public class MainActivity extends AppCompatActivity implements NoticiesListAdapt
     private RecyclerView mNoticiesRecyclerView;
     private ProgressBar mLoadingIndicator;
     private TextView mErrorMessageDisplay;
-    private static ArrayList<Noticia> mLlistaNoticies;
+    private ArrayList<Noticia> mLlistaNoticies;
     private Context mContext;
-    private static boolean isFirstAppExecution = true;
-    public final static String LOG_TAG = "TESTING -------->>>>>  ";
+    private boolean isFirstAppExecution = true;
+    public final String LOG_TAG = "Lector RSS Debug ---> ";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //La llista de noticies es guarda al Bundle savedInstanceState quan es pausa l'app per tal
+        //de no haver de descarregarla d'internet o carregarla de la base de dades cada cop.
+        if (savedInstanceState!=null) {
+            if (savedInstanceState.containsKey(getString(R.string.llista_save_instance_state))) {
+                mLlistaNoticies = (ArrayList<Noticia>) savedInstanceState.getSerializable(getString(R.string.llista_save_instance_state));
+            }
+            if (savedInstanceState.containsKey(getString(R.string.first_app_run_save_instance_state))) {
+                isFirstAppExecution = savedInstanceState.getBoolean(getString(R.string.first_app_run_save_instance_state));
+            }
+        }
+
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -403,4 +415,15 @@ public class MainActivity extends AppCompatActivity implements NoticiesListAdapt
         }
     }
 
+    /**
+     * Quan l'aplicació entra onPause es guarda a aquest Bundle la llista de noticies.
+     * A onCreate podem recuperar aquest Bundle
+     * @param outState
+     */
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(getString(R.string.llista_save_instance_state),mLlistaNoticies);
+        outState.putBoolean(getString(R.string.first_app_run_save_instance_state), isFirstAppExecution);
+    }
 }

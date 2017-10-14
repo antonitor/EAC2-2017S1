@@ -1,6 +1,5 @@
 package cat.xtec.ioc.eac2_2017s1.utils;
 
-import android.util.Log;
 import android.util.Xml;
 
 import org.xmlpull.v1.XmlPullParser;
